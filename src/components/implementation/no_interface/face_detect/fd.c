@@ -5,9 +5,6 @@
 #define X_SLICE 1
 #define Y_SLICE 1
 
-int ccinit, ccclose, cccleanup, ccdelete, ccout;
-int cchit, cccall;
-
 void
 cos_init(void)
 {

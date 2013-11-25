@@ -7,8 +7,6 @@
 #define Y_SLICE 1
 
 void cos_ccv_merge(ccv_dense_matrix_t* mat[], ccv_dense_matrix_t** output, int rows, int cols, int x, int y);
-int ccinit, ccclose, cccleanup, ccdelete, ccout;
-int cchit, cccall;
 
 void
 cos_init(void *args)
