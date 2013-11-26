@@ -11,12 +11,6 @@ void cos_ccv_merge(ccv_dense_matrix_t* mat[], ccv_dense_matrix_t** output, int r
 void
 cos_init(void *args)
 {
-	ccinit = 0;
-	ccclose = 0;
-	cccleanup = 0;
-	ccdelete = 0;
-	ccout = 0;
-
 	printc("Edge Detection Test\n");
 
 	ccv_enable_cache(10240);
@@ -50,7 +44,6 @@ cos_init(void *args)
 
 
 	printc("done\n");
-	printc("ccv_init:    %d\nccv_close:   %d\nccv_cleanup: %d\nccv_delete:  %d\nccv_out:     %d\nccv_hit: %d\nccv_call: %d\n", ccinit, ccclose, cccleanup, ccdelete, ccout, cchit, cccall);
 
 	return;
 }

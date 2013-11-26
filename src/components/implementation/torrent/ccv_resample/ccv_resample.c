@@ -61,7 +61,7 @@ tmerge(spdid_t spdid, td_t td, td_t td_into, char *param, int len)
 void
 trelease(spdid_t spdid, td_t td)
 {
-       return -EINVAL;
+       return;
 }
 
 int 
