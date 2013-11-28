@@ -16,34 +16,25 @@
 #include <cos_map.h>
 #include "../../../lib/libccv/ccv.h"
 
-/**
- * td     : input dense matrix
- * param  : CCV_INTER_AREA(downsampling), CCV_INTER_CUBIC(upsampling) // TODO: or use simpler notation?
- * len	  : multiples of upsamling or downsampling // TODO: accept decimal?
- * return : output dense matrix
- *
- * TODO: param as row or col to achieve finer-grained sampling? 
- */
-
 td_t 
 tsplit(spdid_t spdid, td_t td, char *param,
        int len, tor_flags_t tflags, long evtid) 
 {
        td_t ret = -1;
        struct torrent *t, *nt;
-       ccv_dense_matrix_t *input, *output;
+       ccv_dense_matrix_t *mat;
 
        if (tor_isnull(td)) return -EINVAL;
 
-       output = NULL;
+       mat = NULL;
        if (td_root != td) {
               t = tor_lookup(td);
               if (!t) ERR_THROW(-EINVAL, done);
-              input = t->data;
-              ccv_resample(input, &output, 0, input->rows / len, input->cols / len, (int)param);
+              input = t->name;
+              ccv_read(file, &output, 0, input->rows / len, input->cols / len, (int)param);
               if (!output) return -ENOENT;
        }
-       nt = tor_alloc(output, tflags);
+       nt = tor_alloc(mat, tflags);
        if (!nt) ERR_THROW(-ENOMEM, done);
        ret = nt->td;
 
@@ -55,7 +46,6 @@ done:
 int 
 tmerge(spdid_t spdid, td_t td, td_t td_into, char *param, int len)
 {
-       printc("tmerge is not defined for this torrent\n");
        return -EINVAL;
 }
 
@@ -79,7 +69,6 @@ done:
 int 
 tread(spdid_t spdid, td_t td, int cbid, int sz)
 {
-       int ret = -1;
        struct torrent *t;
        char *buf;
 
@@ -95,15 +84,13 @@ tread(spdid_t spdid, td_t td, int cbid, int sz)
        if (!buf) ERR_THROW(-EINVAL, done);
 
        memcpy(buf, t->data, sizeof(ccv_dense_matrix_t));
-       ret = sizeof(ccv_dense_matrix_t);
 done:	
-       return ret;
+       return sizeof(ccv_dense_matrix_t);
 }
 
 int 
 twrite(spdid_t spdid, td_t td, int cbid, int sz)
 {
-       int ret = -1;
        struct torrent *t;
        char *buf;
 
@@ -117,10 +104,9 @@ twrite(spdid_t spdid, td_t td, int cbid, int sz)
        buf = cbuf2buf(cbid, sz);
        if (!buf) ERR_THROW(-EINVAL, done);
 
-       memcpy(buf, tp>data, sizeof(ccv_dense_matrix_t));
-       ret = sizeof(ccv_dense_matrix_t);
+       memcpy(buf, t->data, sizeof(ccv_dense_matrix_t));
 done:
-       return ret;
+       return sizeof(ccv_dense_matrix_t);
 }
 
 int 
