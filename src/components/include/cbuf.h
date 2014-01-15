@@ -263,7 +263,6 @@ cbuf_vect_lookup_addr(long idx, int tmem)
 static inline void * 
 __cbuf2buf(cbuf_t cb, int len, int tmem)
 {
-	printc("cb = %d, len = %d\n", cb, len);
 	u32_t id;
 	struct cbuf_meta *cm;
 	union cbufm_info ci;//, ci_new;

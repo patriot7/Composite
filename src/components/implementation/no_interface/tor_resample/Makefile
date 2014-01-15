@@ -5,7 +5,7 @@ INTERFACES=
 DEPENDENCIES=sched printc timed_blk torrent cbufp cbuf_c evt mem_mgr_large valloc lock
 IF_LIB=./cos_libccv.a $(DIETDIR)/bin-i386/libm.a
 OBJLIBS+=$(POSIX_LIB)
-FN_PREPEND=file_ ccv_rd_ ccv_res_
+FN_PREPEND=file_ ccv_res_
 
 pre: first all
 first:

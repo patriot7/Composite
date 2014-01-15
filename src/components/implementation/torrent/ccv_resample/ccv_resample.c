@@ -37,20 +37,25 @@ tsplit(spdid_t spdid, td_t td, char *param,
        if (tor_isnull(td)) return -EINVAL;
 
        int input_mat_cbid;
-       char *d;
+       char *buf;
        ccv_dense_matrix_t *input = NULL;
        ccv_dense_matrix_t *output = NULL;
 
        input_mat_cbid = atoi(param);
        printc("cbid: %d\n", input_mat_cbid);
-       d = cbuf2buf(input_mat_cbid, sizeof(ccv_dense_matrix_t));
-       assert(d);
+       buf = cbuf2buf(input_mat_cbid, sizeof(ccv_dense_matrix_t));
+       assert(buf);
        /*input = malloc(sizeof(ccv_dense_matrix_t));*/
        /*assert(input);*/
        /*memcpy(input, d, sizeof(ccv_dense_matrix_t));*/
+       input = (ccv_dense_matrix_t *)buf;
+       printc("resampled rows = %d, cols = %d\n", input->rows, input->cols);
 
-       ccv_resample(d, &output, 0, input->rows / 2, input->cols / 2, CCV_INTER_AREA);
+       ccv_resample((ccv_dense_matrix_t *)input, &output, 0, input->rows / 2, input->cols / 2, CCV_INTER_AREA);
        assert(output);
+
+       printc("what the ????");
+       printc("resampled rows = %d, cols = %d\n", output->rows, output->cols);
 
        if (!output) return -ENOENT;
        nt = tor_alloc(output, tflags);
@@ -92,19 +97,21 @@ tread(spdid_t spdid, td_t td, int cbid, int sz)
        struct torrent *t;
        char *buf;
 
-       if (tor_isnull(td)) return -EINVAL;
+       /*if (tor_isnull(td)) return -EINVAL;*/
 
-       t = tor_lookup(td);
-       if (!t) ERR_THROW(-EINVAL, done);
-       assert(!tor_is_usrdef(td) || t->data);
-       if (!(t->flags & TOR_READ)) ERR_THROW(-EACCES, done);
-       if (!t->data) ERR_THROW(0, done);
+       /*t = tor_lookup(td);*/
+       /*if (!t) ERR_THROW(-EINVAL, done);*/
+       /*assert(!tor_is_usrdef(td) || t->data);*/
+       /*if (!(t->flags & TOR_READ)) ERR_THROW(-EACCES, done);*/
+       /*if (!t->data) ERR_THROW(0, done);*/
 
        buf = cbuf2buf(cbid, sizeof(ccv_dense_matrix_t));
        assert(buf);
+       ccv_dense_matrix_t *test = (ccv_dense_matrix_t *)buf;
+       printc("tread: test->rows = %d, test->cols = %d\n", test->rows, test->cols);
        if (!buf) ERR_THROW(-EINVAL, done);
 
-       memcpy(buf, t->data, sizeof(ccv_dense_matrix_t));
+       /*memcpy(buf, t->data, sizeof(ccv_dense_matrix_t));*/
        ret = sizeof(ccv_dense_matrix_t);
 done:	
        return ret;

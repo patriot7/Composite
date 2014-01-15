@@ -28,6 +28,12 @@ twritep(spdid_t spdid, td_t td, int cbid, int sz)
         return -ENOTSUP;
 }
 
+__attribute__((weak)) int
+twritep(spdid_t spdid, td_t td, int cbid, int sz)
+{
+        return -ENOTSUP;
+}
+
 COS_MAP_CREATE_STATIC(torrents);
 struct torrent null_torrent, root_torrent;
 
