@@ -18,7 +18,7 @@ static cos_lock_t fs_lock;
 
 /* Default torrent implementations */
 __attribute__((weak)) int
-treadp(spdid_t spdid, int sz, int *off, int *len)
+treadp(spdid_t spdid, td_t td, int *off, int *len)
 {
         return -ENOTSUP;
 }

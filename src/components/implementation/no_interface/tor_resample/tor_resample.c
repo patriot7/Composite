@@ -7,7 +7,8 @@
 #include <cbuf.h>
 #include <cos_alloc.h>
 
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 /*typedef union {*/
 	/*unsigned char* u8;*/
 	/*int* i32;*/
@@ -36,12 +37,8 @@ ccv_dense_matrix_t *cbufp_ccv_dense_matrix_new(int rows, int cols, int type, voi
 
 	return mat;
 }
-
-
-
-
-
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 typedef struct {
         int type;
         int rows;
@@ -65,7 +62,6 @@ cbufp_mat_new(ccv_dense_matrix_t *ccv_mat)
         cbufp_mat->step = ccv_mat->step;
         cbufp_mat->datasize = bufstep * ccv_mat->rows;
 
-        assert(sizeof(unsigned char *) == 4);
         cbufp_mat->data = &(cbufp_mat->data) + 4;
 
         memcpy((void *)cbufp_mat->data, (void *)ccv_mat->data.u8, cbufp_mat->datasize);
@@ -82,28 +78,36 @@ cos_init(void)
 {
         ccv_disable_cache();
 
+        cbufp_t cb;
+        char *buf;
+        int mat_size;
+        /*struct cbuf_alloc_desc *d;*/
+        long evtid = evt_split(cos_spd_id(), 0, 0);
+
         ccv_dense_matrix_t *ccv_mat = 0;
         cbufp_mat_t *cbufp_mat = 0;
 
         ccv_read("photo.bmp", &ccv_mat, CCV_IO_ANY_FILE | CCV_IO_GRAY);
         cbufp_mat = cbufp_mat_new(ccv_mat);
-
-        cbufp_t cb;
-        char *buf;
-        /*struct cbuf_alloc_desc *d;*/
-        long evtid = evt_split(cos_spd_id(), 0, 0);
+        assert(cbufp_mat);
+        /*ccv_matrix_free_immediately(ccv_mat);*/
 
         td_t t = ccv_res_tsplit(cos_spd_id(), td_root, "", strlen(""), TOR_ALL,  evtid);
         /*d = &cb;*/
-        int mat_size = sizeof(cbufp_mat_t) + cbufp_mat->datasize; /* header + data */ 
-        printc("mat_size = %d\n", mat_size);
+        mat_size = sizeof(cbufp_mat_t) + cbufp_mat->datasize; /* header + data */ 
         buf = cbufp_alloc(mat_size, &cb);
         assert(buf);
         memcpy(buf, cbufp_mat, mat_size);
         cbufp_send_deref(cb);
 
         ccv_res_twritep(cos_spd_id(), t, cb, mat_size);
-        ccv_res_tsplit(cos_spd_id(), t, "", strlen(""), TOR_ALL, evtid);
+        td_t nt = ccv_res_tsplit(cos_spd_id(), t, "", strlen(""), TOR_ALL, evtid);
+
+        int off, len;
+        cbuf_t cb_new = (cbuf_t)ccv_res_treadp(cos_spd_id(), nt, &off, &len);
+        char *buf_new = cbufp2buf(cb_new, sizeof(cbufp_mat_t));
+        
+        printc("buf_new->cols = %d\n", ((cbufp_mat_t *)buf_new)->cols);
 
         return;
 }
