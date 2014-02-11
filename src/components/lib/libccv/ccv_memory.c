@@ -3,6 +3,16 @@
 #include "3rdparty/sha1/sha1.h"
 
 #define __thread
+#define CBUF_ENABLE
+
+#ifdef CBUF_ENABLE
+#include "cbuf_ccv.h"
+
+#define ccmalloc cbuf_ccv_alloc 
+#define ccfree cbuf_ccv_free
+/*cbufp_ccv_alloc_creator(ccmalloc);*/
+/*cbufp_ccv_free_creator(ccfree);*/
+#endif
 
 static __thread ccv_cache_t ccv_cache;
 
@@ -20,6 +30,9 @@ ccv_dense_matrix_t* ccv_dense_matrix_new(int rows, int cols, int type, void* dat
 	ccv_dense_matrix_t* mat;
 	if (ccv_cache_opt && sig != 0 && !data && !(type & CCV_NO_DATA_ALLOC))
 	{
+#ifdef CBUF_ENABLE
+		assert(0); /* ccv_cache not supported */ 
+#endif
 		uint8_t type;
 		mat = (ccv_dense_matrix_t*)ccv_cache_out(&ccv_cache, sig, &type);
 		if (mat)
@@ -32,20 +45,32 @@ ccv_dense_matrix_t* ccv_dense_matrix_new(int rows, int cols, int type, void* dat
 	}
 	if (type & CCV_NO_DATA_ALLOC)
 	{
+#ifdef CBUF_ENABLE
+		assert(0); /* CCV_NO_DATA_ALLOC not supported */ 
+#endif
 		mat = (ccv_dense_matrix_t*)ccmalloc(sizeof(ccv_dense_matrix_t));
 		mat->type = (CCV_GET_CHANNEL(type) | CCV_GET_DATA_TYPE(type) | CCV_MATRIX_DENSE | CCV_NO_DATA_ALLOC) & ~CCV_GARBAGE;
 		mat->data.u8 = data;
 	} else {
+#ifdef CBUF_ENABLE
+		assert(data == NULL);  /* no user-managed matrix data */ 
+#endif
 		mat = (ccv_dense_matrix_t*)(data ? data : ccmalloc(ccv_compute_dense_matrix_size(rows, cols, type)));
 		mat->type = (CCV_GET_CHANNEL(type) | CCV_GET_DATA_TYPE(type) | CCV_MATRIX_DENSE) & ~CCV_GARBAGE;
 		mat->type |= data ? CCV_UNMANAGED : CCV_REUSABLE; // it still could be reusable because the signature could be derived one.
+#ifndef CBUF_ENABLE
 		mat->data.u8 = (unsigned char*)(mat + 1);
+#endif
 	}
 	mat->sig = sig;
 	mat->rows = rows;
 	mat->cols = cols;
 	mat->step = (cols * CCV_GET_DATA_TYPE_SIZE(type) * CCV_GET_CHANNEL(type) + 3) & -4;
 	mat->refcount = 1;
+#ifdef CBUF_ENABLE
+	cbuf_ccv_set(mat);
+#endif
+
 	return mat;
 }
 
@@ -174,7 +199,10 @@ void ccv_matrix_free(ccv_matrix_t* mat)
 			!(dmt->type & CCV_REUSABLE) || // or this is not a reusable piece
 			dmt->sig == 0 || // or this doesn't have valid signature
 			(dmt->type & CCV_NO_DATA_ALLOC)) // or this matrix is allocated as header-only, therefore we cannot cache it
+		{
 			ccfree(dmt);
+			/* TODO just deref cbufp or clean the whole cbufp? */ 
+		}
 		else {
 			assert(CCV_GET_DATA_TYPE(dmt->type) == CCV_8U ||
 				   CCV_GET_DATA_TYPE(dmt->type) == CCV_32S ||
