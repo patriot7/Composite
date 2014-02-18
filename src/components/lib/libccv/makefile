@@ -1,6 +1,6 @@
 CC := ../dietlibc-0.29/bin-i386/diet gcc 
 AR := ar
-CFLAGS := -Wall -nostdinc -nostdlib -fno-stack-protector
+CFLAGS := -Wall -nostdinc -nostdlib -fno-stack-protector -ggdb3
 
 .PHONY: all clean
 

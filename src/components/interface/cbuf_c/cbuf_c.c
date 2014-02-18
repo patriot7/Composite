@@ -129,6 +129,7 @@ __cbuf_2buf_miss(int cbid, int len, int tmem)
 	if (tmem) ret = cbuf_c_retrieve(cos_spd_id(), cbid, len);
 	else      ret = cbufp_retrieve(cos_spd_id(), cbid, len);
 	CBUF_TAKE();
+	printc("mc->sz = %d, len = %d\n", mc->sz, len);
 	if (unlikely(ret < 0                                   ||
 		     mc->sz < (len >> PAGE_ORDER)              ||
 		     (tmem && !(mc->nfo.c.flags & CBUFM_TMEM)) || 

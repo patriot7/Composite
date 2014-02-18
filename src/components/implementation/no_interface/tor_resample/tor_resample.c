@@ -43,33 +43,36 @@ ccv_dense_matrix_t *cbufp_ccv_dense_matrix_new(int rows, int cols, int type, voi
 
 
 typedef struct {
-        struct {
-                int type;
-                int rows;
-                int cols;
-                int step;
-                int datasize;
-        } header;
-	ccv_matrix_cell_t data; /* use u8 for bmp */ 
-} cbufp_ccv_dense_matrix_t;
+        int type;
+        int rows;
+        int cols;
+        int step;
+        int datasize;
+        unsigned char *data; /* use u8 for bmp */ 
+} cbufp_mat_t;
 
-cbufp_ccv_dense_matrix_t *
+cbufp_mat_t *
 cbufp_mat_new(ccv_dense_matrix_t *ccv_mat)
 {
         assert(ccv_mat != NULL);
-        cbufp_ccv_dense_matrix_t *cbufp_mat = malloc(sizeof(cbufp_ccv_dense_matrix_t));
+        int bufstep = (ccv_mat->cols * 3 + 3) & -4; /* from ccv_io_bmp, only for 24bpp bitmap */
+        printc("bufsetp = %d\n", bufstep);
+        cbufp_mat_t* cbufp_mat = malloc(sizeof(cbufp_mat_t) + ccv_mat->rows * bufstep);
 
-        cbufp_mat->header.type = ccv_mat->type;
-        cbufp_mat->header.rows = ccv_mat->rows;
-        cbufp_mat->header.cols = ccv_mat->cols;
-        cbufp_mat->header.step = ccv_mat->step;
-        cbufp_mat->header.datasize = (ccv_mat->cols * 3 + 3) & -4; /* from ccv_io_bmp, only for 24bpp bitmap */
+        cbufp_mat->type = ccv_mat->type;
+        cbufp_mat->rows = ccv_mat->rows;
+        cbufp_mat->cols = ccv_mat->cols;
+        cbufp_mat->step = ccv_mat->step;
+        cbufp_mat->datasize = bufstep * ccv_mat->rows;
 
-        ccv_matrix_cell_t data;
-        data.u8 = (unsigned char *)malloc(cbufp_mat->header.datasize);
+        assert(sizeof(unsigned char *) == 4);
+        cbufp_mat->data = &(cbufp_mat->data) + 4;
 
-        memcpy((void *)data.u8, (void *)ccv_mat->data.u8, cbufp_mat->header.datasize);
-        cbufp_mat->data.u8 = data.u8;
+        memcpy((void *)cbufp_mat->data, (void *)ccv_mat->data.u8, cbufp_mat->datasize);
+        printc("cbufp_mat->rows = %d\n", cbufp_mat->rows);
+        printc("cbufp_mat->cols = %d\n", cbufp_mat->cols);
+        printc("cbufp_mat->step = %d\n", cbufp_mat->step);
+        printc("cbufp_mat->datasize= %d\n", cbufp_mat->datasize);
 
         return cbufp_mat; 
 }
@@ -78,19 +81,29 @@ void
 cos_init(void)
 {
         ccv_disable_cache();
-        ccv_dense_matrix_t *ccv_mat = 0;
-        ccv_read("photo.bmp", &ccv_mat, CCV_IO_ANY_FILE | CCV_IO_GRAY);
 
-        cbufp_ccv_dense_matrix_t *cbufp_mat;
+        ccv_dense_matrix_t *ccv_mat = 0;
+        cbufp_mat_t *cbufp_mat = 0;
+
+        ccv_read("photo.bmp", &ccv_mat, CCV_IO_ANY_FILE | CCV_IO_GRAY);
         cbufp_mat = cbufp_mat_new(ccv_mat);
 
         cbufp_t cb;
         char *buf;
-        struct cbuf_alloc_desc *d;
+        /*struct cbuf_alloc_desc *d;*/
+        long evtid = evt_split(cos_spd_id(), 0, 0);
 
-        d = &cb;
-        buf = cbufp_alloc(cbufp_mat->header.datasize, &cb);
+        td_t t = ccv_res_tsplit(cos_spd_id(), td_root, "", strlen(""), TOR_ALL,  evtid);
+        /*d = &cb;*/
+        int mat_size = sizeof(cbufp_mat_t) + cbufp_mat->datasize; /* header + data */ 
+        printc("mat_size = %d\n", mat_size);
+        buf = cbufp_alloc(mat_size, &cb);
+        assert(buf);
+        memcpy(buf, cbufp_mat, mat_size);
         cbufp_send_deref(cb);
+
+        ccv_res_twritep(cos_spd_id(), t, cb, mat_size);
+        ccv_res_tsplit(cos_spd_id(), t, "", strlen(""), TOR_ALL, evtid);
 
         return;
 }

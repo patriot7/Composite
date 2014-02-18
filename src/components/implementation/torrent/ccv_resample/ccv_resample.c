@@ -17,6 +17,15 @@
 #include <stdlib.h>
 #include "../../../lib/libccv/ccv.h"
 
+typedef struct {
+        int type;
+        int rows;
+        int cols;
+        int step;
+        int datasize;
+        unsigned char *data; /* u8 */ 
+} cbufp_mat_t;
+
 /**
  * td     : input dense matrix
  * param  : CCV_INTER_AREA(downsampling), CCV_INTER_CUBIC(upsampling) // TODO: or use simpler notation?
@@ -30,37 +39,31 @@ td_t
 tsplit(spdid_t spdid, td_t td, char *param,
        int len, tor_flags_t tflags, long evtid) 
 {
-       printc("called ccv_res\n");
        td_t ret = -1;
        struct torrent *t, *nt;
 
        if (tor_isnull(td)) return -EINVAL;
 
-       int input_mat_cbid;
-       char *buf;
-       ccv_dense_matrix_t *input = NULL;
-       ccv_dense_matrix_t *output = NULL;
+       if (td == td_root) { 
+	      nt = tor_alloc(NULL, tflags);
+	      if (!nt) ERR_THROW(-ENOMEM, done);
+	      ret = nt->td;
+       } else {
+	      t = tor_lookup(td);
+	      assert(t);
 
-       input_mat_cbid = atoi(param);
-       printc("cbid: %d\n", input_mat_cbid);
-       buf = cbuf2buf(input_mat_cbid, sizeof(ccv_dense_matrix_t));
-       assert(buf);
-       /*input = malloc(sizeof(ccv_dense_matrix_t));*/
-       /*assert(input);*/
-       /*memcpy(input, d, sizeof(ccv_dense_matrix_t));*/
-       input = (ccv_dense_matrix_t *)buf;
-       printc("resampled rows = %d, cols = %d\n", input->rows, input->cols);
+	      assert(t->data);
+	      cbufp_mat_t *cbufp_mat = (cbufp_mat_t *)t->data;
 
-       ccv_resample((ccv_dense_matrix_t *)input, &output, 0, input->rows / 2, input->cols / 2, CCV_INTER_AREA);
-       assert(output);
+	      ccv_dense_matrix_t *ccv_mat = ccv_dense_matrix_new(cbufp_mat->rows, cbufp_mat->cols, cbufp_mat->type, 0, 0);
+	      assert(ccv_mat);
 
-       printc("what the ????");
-       printc("resampled rows = %d, cols = %d\n", output->rows, output->cols);
+	      ccv_mat->data.u8 = cbufp_mat->data;
 
-       if (!output) return -ENOENT;
-       nt = tor_alloc(output, tflags);
-       if (!nt) ERR_THROW(-ENOMEM, done);
-       ret = nt->td;
+	      ccv_dense_matrix_t *new_ccv_mat = 0;
+	      ccv_resample(ccv_mat, &new_ccv_mat, 0, ccv_mat->rows / 5, ccv_mat->cols / 5, CCV_INTER_AREA);
+	      printc("new rows = %d\n", new_ccv_mat->rows);
+       }
 
        evt_trigger(cos_spd_id(), evtid);
 done:
@@ -70,72 +73,49 @@ done:
 int 
 tmerge(spdid_t spdid, td_t td, td_t td_into, char *param, int len)
 {
-       printc("tmerge is not defined for this torrent\n");
        return -EINVAL;
 }
 
 void
 trelease(spdid_t spdid, td_t td)
 {
-       printc("call trelease in ccv_resample!\n");
-	struct torrent *t;
-
-	if (!tor_is_usrdef(td)) return;
-
-	t = tor_lookup(td);
-	if (!t) goto done;
-        ccv_matrix_free((ccv_dense_matrix_t *)t->data);
-	tor_free(t);
-done:
 	return;
 }
 
 int 
 tread(spdid_t spdid, td_t td, int cbid, int sz)
 {
-       int ret = -1;
-       struct torrent *t;
-       char *buf;
+       return -1;
+}
 
-       /*if (tor_isnull(td)) return -EINVAL;*/
-
-       /*t = tor_lookup(td);*/
-       /*if (!t) ERR_THROW(-EINVAL, done);*/
-       /*assert(!tor_is_usrdef(td) || t->data);*/
-       /*if (!(t->flags & TOR_READ)) ERR_THROW(-EACCES, done);*/
-       /*if (!t->data) ERR_THROW(0, done);*/
-
-       buf = cbuf2buf(cbid, sizeof(ccv_dense_matrix_t));
-       assert(buf);
-       ccv_dense_matrix_t *test = (ccv_dense_matrix_t *)buf;
-       printc("tread: test->rows = %d, test->cols = %d\n", test->rows, test->cols);
-       if (!buf) ERR_THROW(-EINVAL, done);
-
-       /*memcpy(buf, t->data, sizeof(ccv_dense_matrix_t));*/
-       ret = sizeof(ccv_dense_matrix_t);
-done:	
-       return ret;
+int
+treadp(spdid_t spdid, int sz, int *off, int *len)
+{
+       return -1;
 }
 
 int 
 twrite(spdid_t spdid, td_t td, int cbid, int sz)
 {
-       int ret = -1;
-       struct torrent *t;
-       char *buf;
+       return -1;
+}
 
-       if (tor_isnull(td)) return -EINVAL;
+int
+twritep(spdid_t spdid, td_t td, int cbid, int sz)
+{
+       int ret = -1;
+
+       char *buf;
+       struct torrent *t;
+
+       buf = cbufp2buf(cbid, sz);
+       assert(buf);
 
        t = tor_lookup(td);
-       if (!t) ERR_THROW(-EINVAL, done);
-       assert(t->data);
-       if (!(t->flags & TOR_WRITE)) ERR_THROW(-EACCES, done);
+       assert(t);
 
-       buf = cbuf2buf(cbid, sz);
-       if (!buf) ERR_THROW(-EINVAL, done);
-
-       memcpy(buf, t->data, sizeof(ccv_dense_matrix_t));
-       ret = sizeof(ccv_dense_matrix_t);
+       t->data = buf;
+       /* ret = len_of_writes */
 done:
        return ret;
 }
