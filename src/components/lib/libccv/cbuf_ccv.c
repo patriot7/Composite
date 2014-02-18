@@ -1,11 +1,8 @@
 #include "cbuf_ccv.h"
 
-/*void *cbufp_alloc(unsigned int sz, cbufp_t *cb);*/
-/*void *cbufp_deref(cbufp_t cbid);*/
-
 extern int printc(char *fmt, ...);
 
-void *cbuf_ccv_alloc(unsigned int);
+void *cbuf_ccv_alloc(unsigned int sz);
 void cbuf_ccv_free(void *ptr);
 
 void

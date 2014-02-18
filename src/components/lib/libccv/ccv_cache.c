@@ -310,7 +310,6 @@ int ccv_cache_put(ccv_cache_t* cache, uint64_t sign, void* x, uint32_t size, uin
 
 static void _ccv_cache_cleanup(ccv_cache_index_t* branch)
 {
-	cccleanup++;
 	int leaf = branch->terminal.off & 0x1;
 	if (!leaf)
 	{

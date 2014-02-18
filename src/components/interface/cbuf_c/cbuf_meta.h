@@ -15,7 +15,7 @@
 #define TMEM_TOUCHED(cci)  (cci->desc.owner.meta->nfo.c.flags & CBUFM_TOUCHED)
 #define TMEM_RELINQ        COMP_INFO_TMEM_CBUF
 #define CBUF_REFCNT_SZ     7
-#define CBUFP_REFCNT_MAX   (1<<CBUF_REFCNT_SZ-1)
+#define CBUFP_REFCNT_MAX   (1<<(CBUF_REFCNT_SZ-1))
 
 /* Shared page between the target component, and us */
 typedef	struct spd_cbvect_range shared_component_info;
@@ -64,8 +64,8 @@ union cbufm_info {
 	u32_t v;      /* value, for atomic manipulation */
 	struct {
 		u32_t         ptr  :20; /* page pointer */
-		u32_t         refcnt:7;
-		cbufm_flags_t flags: 5;
+		u32_t         refcnt:6;
+		cbufm_flags_t flags: 6;
 	} __attribute__((packed)) c;
 };
 

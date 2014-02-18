@@ -26,15 +26,12 @@ tsplit(spdid_t spdid, td_t td, char *param,
 
        if (td != td_root) return -EINVAL;
 
-       assert(0);
        nt = tor_alloc(NULL, tflags);
-       assert(0);
        nt->data = atoi(param);
        if (!nt) ERR_THROW(-ENOMEM, done);
        ret = nt->td;
 
        evt_trigger(cos_spd_id(), evtid);
-       assert(0);
 done:
        return ret;
 }
