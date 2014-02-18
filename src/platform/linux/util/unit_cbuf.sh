@@ -23,7 +23,3 @@ va.o-fprr.o|print.o|mm.o|l.o|boot.o|vm.o;\
 ucbuf1.o-fprr.o|sm.o|ucbuf2.o|print.o|mm.o|va.o|buf.o|bufp.o|l.o;\
 ucbuf2.o-sm.o|print.o|mm.o|va.o|bufp.o|buf.o|l.o\
 " ./gen_client_stub
-
-#mpd.o-sm.o|cg.o|fprr.o|print.o|te.o|mm.o|va.o;\
-#!mpd.o,a5;
-#[print_]trans.o

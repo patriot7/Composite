@@ -32,6 +32,7 @@ cbuf_ccv_alloc(unsigned int sz)
         * cbuf_size = cbuf_header +data
 	*/
 	unsigned int cbuf_size = sz - sizeof(ccv_dense_matrix_t) + sizeof(cbuf_matrix_t);
+	printc("sz = %d, cbuf_size = %d\n", sz, cbuf_size);
 	cbufp_t cb;
 	ccv_dense_matrix_t *mat = NULL;
 	cbuf_matrix_t *cbuf_mat = NULL;
@@ -45,17 +46,23 @@ cbuf_ccv_alloc(unsigned int sz)
 	cbuf_mat->size = cbuf_size;
 	mat->data.u8 = cbuf_mat->data;
 
+	printc("cbuf_ccv_alloc done\n");
+
 	return mat;
 }
 
 void
 cbuf_ccv_set(ccv_dense_matrix_t *mat)
 {
+	printc("cbuf_ccv_set begin\n");
+
 	cbuf_matrix_t *cbuf_mat = (cbuf_matrix_t *)(mat->data.u8 - sizeof(cbuf_matrix_t));
 	cbuf_mat->type = mat->type;
 	cbuf_mat->rows = mat->rows;
 	cbuf_mat->cols = mat->cols;
 	cbuf_mat->step = mat->step;
+
+	printc("cbuf_ccv_set done\n");
 
 	return;
 }

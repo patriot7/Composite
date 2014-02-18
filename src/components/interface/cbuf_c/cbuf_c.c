@@ -126,7 +126,10 @@ __cbuf_2buf_miss(int cbid, int len, int tmem)
 	}
 
 	CBUF_RELEASE();
-	if (tmem) ret = cbuf_c_retrieve(cos_spd_id(), cbid, len);
+	if (tmem) {
+		printc("call cbuf_retrieve from comp %ld\n", cos_spd_id());
+		ret = cbuf_c_retrieve(cos_spd_id(), cbid, len);
+	}
 	else      ret = cbufp_retrieve(cos_spd_id(), cbid, len);
 	CBUF_TAKE();
 	if (unlikely(ret < 0                                   ||

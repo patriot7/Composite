@@ -26,12 +26,15 @@ tsplit(spdid_t spdid, td_t td, char *param,
 
        if (td != td_root) return -EINVAL;
 
+       assert(0);
        nt = tor_alloc(NULL, tflags);
+       assert(0);
        nt->data = atoi(param);
        if (!nt) ERR_THROW(-ENOMEM, done);
        ret = nt->td;
 
        evt_trigger(cos_spd_id(), evtid);
+       assert(0);
 done:
        return ret;
 }
@@ -58,16 +61,16 @@ int
 treadp(spdid_t spdid, td_t td, int *off, int *len)
 {
        cbufp_t cb;
-       /*char *buf;*/
-       /*struct torrent *t;*/
-       /*cbufp_matrix_t *cbufp_mat;*/
+       char *buf;
+       struct torrent *t;
+       cbuf_matrix_t *cbuf_mat;
 
-       /*t = tor_lookup(td);*/
-       /*assert(t);*/
+       t = tor_lookup(td);
+       assert(t);
 
-       /*cbufp_mat = (cbufp_matrix_t *)t->data;*/
-       /*buf = cbufp_alloc(cbufp_mat->size, &cb);*/
-       /*cbufp_send_deref(cb);*/
+       cbuf_mat = (cbuf_matrix_t *)t->data;
+       buf = cbufp_alloc(cbuf_mat->size, &cb);
+       cbufp_send_deref(cb);
 
        return cb;
 }
@@ -83,29 +86,31 @@ twritep(spdid_t spdid, td_t td, int cbid, int sz)
 {
        int ret = -1;
 
-       /*cbufp_t cb;*/
-       /*char *buf;*/
-       /*int ratio;*/
-       /*struct torrent *t;*/
-       /*ccv_dense_matrix_t *ccv_mat_input = NULL;*/
-       /*ccv_dense_matrix_t *ccv_mat_output = NULL;*/
+       cbufp_t cb;
+       char *buf;
+       int ratio;
+       struct torrent *t;
+       ccv_dense_matrix_t *ccv_mat_input = NULL;
+       ccv_dense_matrix_t *ccv_mat_output = NULL;
 
-       /*if (tor_isnull(td)) return -EINVAL;*/
+       printc("begin twritep\n");
 
-       /*t = tor_lookup(td);*/
-       /*assert(t);*/
+       if (tor_isnull(td)) return -EINVAL;
 
-       /*ratio = (int)t->data;*/
+       t = tor_lookup(td);
+       assert(t);
 
-       /*buf = cbufp2buf(cbid, sz);*/
-       /*assert(buf);*/
+       ratio = (int)t->data;
 
-       /*ccv_mat_input = cbufp2ccvmat((cbufp_matrix_t *)buf);*/
+       buf = cbufp2buf(cbid, sz);
+       assert(buf);
 
-       /*ccv_resample(ccv_mat_input, &ccv_mat_output, 0, ccv_mat_input->rows / ratio, ccv_mat_input->cols / ratio, CCV_INTER_AREA);*/
+       ccv_mat_input = cbuf2ccvmat((cbuf_matrix_t *)buf);
 
-       /*cbufp_matrix_t *cbufp_mat = ccv2cbufpmat(ccv_mat_output);*/
-        /* send the cbufp_mat  to next component */ 
+       ccv_resample(ccv_mat_input, &ccv_mat_output, 0, ccv_mat_input->rows / ratio, ccv_mat_input->cols / ratio, CCV_INTER_AREA);
+
+       cbuf_matrix_t *cbuf_mat = ccv2cbufmat(ccv_mat_output);
+       /*send the cbuf_mat  to next component  */
 
        return ret; /*TODO: ret value */ 
 }
