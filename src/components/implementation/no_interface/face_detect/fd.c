@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include "../../../lib/libccv/ccv.h"
 
-#define X_SLICE 5
-#define Y_SLICE 7
+#define X_SLICE 1
+#define Y_SLICE 1
 
 int ccinit, ccclose, cccleanup, ccdelete, ccout;
 int cchit, cccall;
@@ -28,6 +28,7 @@ cos_init(void)
         ccv_array_t* seq;
 
         seq = ccv_bbf_detect_objects(image, &cascade, 1, ccv_bbf_default_params);
+        printc("detect %d faces\n", seq->rnum);
         ccv_array_free(seq);
 
         int sliced_total = 0;
