@@ -32,7 +32,7 @@ libc_syscall_override(cos_syscall_t fn, int syscall_num)
 int
 cos_open(const char *pathname, int flags, int mode)
 {
-        /*mode param is only for O_CREAT in flags*/
+        /* mode param is only for O_CREAT in flags */
         td_t td;
         long evt;
         evt = evt_split(cos_spd_id(), 0, 0);

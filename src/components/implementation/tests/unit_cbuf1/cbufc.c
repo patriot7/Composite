@@ -24,6 +24,12 @@ void cos_init(void)
 
 	printc("UNIT TEST Unit tests for cbufs...\n");
 
+	cbufp_t cb;
+	void *buf;
+	buf = cbufp_alloc(30000, &cb);
+	assert(buf);
+	printc("test done\n");
+
 	for (i = 0 ; i < MAX_CBUFS ; i++) {
 		int sz = (rand() % MAX_CBUF_SZ) + 1;
 		bufs[i] = cbuf_alloc(sz, &cbs[i]);

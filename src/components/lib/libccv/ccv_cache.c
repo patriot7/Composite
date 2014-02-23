@@ -6,13 +6,14 @@
 #define CCV_GET_TERMINAL_SIZE(x) ((x) & 0xFFFFFFFF)
 #define CCV_SET_TERMINAL_TYPE(x, y, z) (((uint64_t)(x) << 60) | ((uint64_t)(y) << 32) | (z))
 
+
 void ccv_cache_init(ccv_cache_t* cache, size_t up, int cache_types, ccv_cache_index_free_f ffree, ...)
 {
+	assert(cache_types > 0 && cache_types <= 16);
 	cache->rnum = 0;
 	cache->age = 0;
 	cache->up = up;
 	cache->size = 0;
-	assert(cache_types > 0 && cache_types <= 16);
 	va_list arguments;
 	va_start(arguments, ffree);
 	int i;

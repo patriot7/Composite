@@ -17,8 +17,8 @@ cos_init(void)
         ccv_read("photo.bmp", &image, CCV_IO_GRAY | CCV_IO_ANY_FILE);
 
         ccv_array_t* seq;
-
         seq = ccv_bbf_detect_objects(image, &cascade, 1, ccv_bbf_default_params);
+        printc("detect %d faces\n", seq->rnum);
         ccv_array_free(seq);
 
         int sliced_total = 0;
