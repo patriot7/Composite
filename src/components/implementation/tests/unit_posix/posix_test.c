@@ -6,6 +6,6 @@
 void
 cos_init(void *args)
 {
-/* use posix functions or system calls ?*/ 
+        /* use posix functions or system calls ?*/ 
         return;
 }
