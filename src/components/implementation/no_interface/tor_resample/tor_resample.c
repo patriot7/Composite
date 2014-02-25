@@ -24,7 +24,7 @@ cos_init(void)
         cbuf_matrix_t *cbuf_mat = ccv2cbufmat(mat);
 
         evtid = evt_split(cos_spd_id(), 0, 0);
-        td = ccv_res_tsplit(cos_spd_id(), td_root, "5", strlen("5"), TOR_ALL, evtid);
+        /*td = ccv_res_tsplit(cos_spd_id(), td_root, "5", strlen("5"), TOR_ALL, evtid);*/
         /*assert(0);*/
         /*ccv_res_twritep(cos_spd_id(), td, cbuf_mat->cbid, cbuf_mat->size);*/
 
