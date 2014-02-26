@@ -53,17 +53,24 @@ KVT_CREATE_DEF(unit,  2, 12, 8, unit_allocfn, unit_freefn);
 KVT_CREATE_DEF(unit2, 3, 6, 12, unit_allocfn, unit_freefn);
 KVT_CREATE_DEF(unit3, 4, 5, 5, unit_allocfn, unit_freefn);
 
-ERT_CREATE_DEF(unit4, 3, 8, 4, 64, unit_allocfn, unit_freefn);
-ERT_CREATE_DEF(unit5, 1, 0, 14, 32, unit_allocfn, unit_freefn);
+ERT_CREATE_DEF(unit4, 3, 8, 4, 64, unit_allocfn);
+ERT_CREATE_DEF(unit5, 1, 0, 14, 32, unit_allocfn);
 
 /* 
  * I separate this out so that we can easily confirm that the compiler
  * is doing the proper optimizations. 
  */
 void *
-do_lookups(struct pair *ps, struct unit_ert *v)
+do_lookups(struct pair *ps, struct unit3_ert *v)
 {
-	return unit_lkupp(v, ps->id);
+	void *r;
+	unsigned long id = ps->id;
+	assert(v);
+	assert(id < unit3_maxid());
+	__asm__("nop; nop; nop");
+	r = unit3_lkupp(v, id);
+	__asm__("nop; nop; nop");
+	return r;
 }
 
 void *
@@ -88,8 +95,8 @@ typedef int (*del_fn_t)(struct ert *v, long id);
 typedef void *(*lkup_fn_t)(struct ert *v, unsigned long id);
 typedef void *(*lkupa_fn_t)(struct ert *v, unsigned long id, unsigned long *agg);
 typedef void *(*lkupan_fn_t)(struct ert *v, unsigned long id, int dlimit, unsigned long *agg);
-typedef int (*expandn_fn_t)(struct ert *v, unsigned long id, u32_t dlimit, void *memctxt);
-typedef int (*expand_fn_t)(struct ert *v, unsigned long id, void * memctxt);
+typedef int (*expandn_fn_t)(struct ert *v, unsigned long id, u32_t dlimit, unsigned long *accum, void *memctxt);
+typedef int (*expand_fn_t)(struct ert *v, unsigned long id, unsigned long *accum, void *memctxt);
 
 void 
 kv_test(int max, alloc_fn_t a, free_fn_t f, lkupp_fn_t lp, add_fn_t add, del_fn_t d, 
@@ -149,7 +156,7 @@ void ert_test(int max, int depth, alloc_fn_t a, lkup_fn_t l, lkupa_fn_t la, lkup
 		for (j = 2 ; j <= depth ; j++) {
 			c   = alloc_cnt;
 			mem = 0;
-			assert(!en(v, pairs[i].id, j, &mem));
+			assert(!en(v, pairs[i].id, j, &accum, &mem));
 			assert(lan(v, pairs[i].id, j, &accum));
 			if (j < depth && mem) {
 				assert(!lan(v, pairs[i].id, j+1, &accum));
