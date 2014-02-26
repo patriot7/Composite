@@ -49,17 +49,13 @@ cbuf_ccv_alloc(unsigned int sz)
 }
 
 void
-cbuf_ccv_set(ccv_dense_matrix_t *mat)
+set_cbuf_header(ccv_dense_matrix_t *mat)
 {
-	printc("cbuf_ccv_set begin\n");
-
 	cbuf_matrix_t *cbuf_mat = (cbuf_matrix_t *)(mat->data.u8 - sizeof(cbuf_matrix_t));
 	cbuf_mat->type = mat->type;
 	cbuf_mat->rows = mat->rows;
 	cbuf_mat->cols = mat->cols;
 	cbuf_mat->step = mat->step;
-
-	printc("cbuf_ccv_set done\n");
 
 	return;
 }
@@ -86,6 +82,8 @@ ccv2cbufmat(ccv_dense_matrix_t *mat)
 {
 	cbuf_matrix_t *cbuf_mat = NULL;
 	cbuf_mat = (cbuf_matrix_t *)(mat->data.u8 - sizeof(cbuf_matrix_t));
+	printc("address = %p\n", mat->data);
+	printc("ccv2cbufmat cbid = %d\n", cbuf_mat->cbid);
 
 	return cbuf_mat;
 }

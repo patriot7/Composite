@@ -17,6 +17,8 @@
 #include <stdlib.h>
 #include "../../../lib/libccv/cbuf_ccv.h"
 
+cbuf_matrix_t *cbuf_mat_tmp;
+
 td_t 
 tsplit(spdid_t spdid, td_t td, char *param,
        int len, tor_flags_t tflags, long evtid) 
@@ -57,19 +59,11 @@ tread(spdid_t spdid, td_t td, int cbid, int sz)
 int
 treadp(spdid_t spdid, td_t td, int *off, int *len)
 {
-       cbufp_t cb;
-       char *buf;
-       struct torrent *t;
-       cbuf_matrix_t *cbuf_mat;
+       *off = 0;
+       *len = cbuf_mat_tmp->size;
+       cbufp_send_deref(cbuf_mat_tmp->cbid);
 
-       t = tor_lookup(td);
-       assert(t);
-
-       cbuf_mat = (cbuf_matrix_t *)t->data;
-       buf = cbufp_alloc(cbuf_mat->size, &cb);
-       cbufp_send_deref(cb);
-
-       return cb;
+       return cbuf_mat_tmp->cbid;
 }
 
 int 
@@ -90,8 +84,6 @@ twritep(spdid_t spdid, td_t td, int cbid, int sz)
        ccv_dense_matrix_t *ccv_mat_input = NULL;
        ccv_dense_matrix_t *ccv_mat_output = NULL;
 
-       printc("begin twritep\n");
-
        if (tor_isnull(td)) return -EINVAL;
 
        t = tor_lookup(td);
@@ -106,8 +98,13 @@ twritep(spdid_t spdid, td_t td, int cbid, int sz)
 
        ccv_resample(ccv_mat_input, &ccv_mat_output, 0, ccv_mat_input->rows / ratio, ccv_mat_input->cols / ratio, CCV_INTER_AREA);
 
-       cbuf_matrix_t *cbuf_mat = ccv2cbufmat(ccv_mat_output);
-       /*send the cbuf_mat  to next component  */
+       cbuf_mat_tmp = ccv2cbufmat(ccv_mat_output);
+
+       /* send the matrix to facedetect torrent */ 
+       long evtid = evt_split(cos_spd_id(), 0, 0);
+       /*next_stage_tsplit(cos_spd_id(), td_root, "", strlen(""), TOR_ALL, evtid);*/
+       /*cbufp_send_deref(cbuf_mat->cbid);*/
+       /*ccv_fd_twritep(cos_spd_id(), td, cbuf_mat->cbid, cbuf_mat->size);*/
 
        return ret; /*TODO: ret value */ 
 }

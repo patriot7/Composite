@@ -68,7 +68,7 @@ ccv_dense_matrix_t* ccv_dense_matrix_new(int rows, int cols, int type, void* dat
 	mat->step = (cols * CCV_GET_DATA_TYPE_SIZE(type) * CCV_GET_CHANNEL(type) + 3) & -4;
 	mat->refcount = 1;
 #ifdef CBUF_ENABLE
-	cbuf_ccv_set(mat);
+	set_cbuf_header(mat);
 #endif
 
 	return mat;

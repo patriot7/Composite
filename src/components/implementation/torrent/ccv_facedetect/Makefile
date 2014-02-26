@@ -1,11 +1,10 @@
-C_OBJS=ccv_resample.o
+C_OBJS=ccv_facedetect.o
 ASM_OBJS=
-COMPONENT=ccv_rs.o
+COMPONENT=ccv_fd.o
 INTERFACES=torrent
 DEPENDENCIES=printc cbufp cbuf_c evt lock mem_mgr_large valloc
 IF_LIB=./cos_libccv.a $(DIETDIR)/bin-i386/libm.a
 OBJLIBS += $(POSIX_LIB)
-FN_PREPEND=next_stage_
 
 pre: first all
 first:
@@ -13,4 +12,3 @@ first:
 	@cp $(CCVOBJ) .
 
 include ../../Makefile.subsubdir
-

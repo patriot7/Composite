@@ -1429,7 +1429,9 @@ ccv_bbf_classifier_cascade_t* ccv_bbf_read_classifier_cascade(const char* direct
 	FILE* r = fopen(buf, "r");
 	if (r == 0)
 		return 0;
+	printc("go to alloc memory\n");
 	ccv_bbf_classifier_cascade_t* cascade = (ccv_bbf_classifier_cascade_t*)ccmalloc(sizeof(ccv_bbf_classifier_cascade_t));
+	printc("alloc done\n");
 	s = fscanf(r, "%d %d %d", &cascade->count, &cascade->size.width, &cascade->size.height);
 	assert(s > 0);
 	cascade->stage_classifier = (ccv_bbf_stage_classifier_t*)ccmalloc(cascade->count * sizeof(ccv_bbf_stage_classifier_t));

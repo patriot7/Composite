@@ -19,19 +19,25 @@ cos_init(void)
         long evtid;
         td_t td;
 
+        evtid = evt_split(cos_spd_id(), 0, 0);
+        td = ccv_res_tsplit(cos_spd_id(), td_root, "5", strlen("5"), TOR_ALL, evtid);
+
         ccv_dense_matrix_t *mat = NULL;
         ccv_read("photo.bmp", &mat, CCV_IO_ANY_FILE | CCV_IO_GRAY);
+        assert(mat);
+
         cbuf_matrix_t *cbuf_mat = ccv2cbufmat(mat);
+	printc("address = %p\n", cbuf_mat->data);
+        printc("mycomp cbid = %d\n", cbuf_mat->cbid);
+        cbufp_send_deref(cbuf_mat->cbid);
+        ccv_res_twritep(cos_spd_id(), td, cbuf_mat->cbid, cbuf_mat->size);
 
-        evtid = evt_split(cos_spd_id(), 0, 0);
-        /*td = ccv_res_tsplit(cos_spd_id(), td_root, "5", strlen("5"), TOR_ALL, evtid);*/
-        /*assert(0);*/
-        /*ccv_res_twritep(cos_spd_id(), td, cbuf_mat->cbid, cbuf_mat->size);*/
-
-        /*cbufp_t cb_out;*/
+        /*cbufp_t cbid;*/
         /*int off, len;*/
-        /*cb_out = ccv_res_treadp(cos_spd_id(), td, &off, &len);*/
-        /*buf = cbufp2buf(cb_out, len);*/
+        /*cbid = treadp(cos_spd_id(), td, &off, &len);*/
+
+        /*buf = cbufp2buf(cbid, len);*/
+        /*cbuf_mat = (cbuf_matrix_t *)buf; */
 
         return;
 }
