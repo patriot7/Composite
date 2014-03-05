@@ -227,6 +227,7 @@ cbuf_unpack(cbuf_t cb, u32_t *cbid)
 	
 	cu.v  = cb;
 	*cbid = cu.c.id;
+	printc("cu.c.aggregate = %d\n", (int)cu.c.aggregate);
 	assert(!cu.c.aggregate);
 	return;
 }
