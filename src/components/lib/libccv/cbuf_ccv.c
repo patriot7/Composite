@@ -29,7 +29,6 @@ cbuf_ccv_alloc(unsigned int sz)
         * cbuf_size = cbuf_header +data
 	*/
 	unsigned int cbuf_size = sz - sizeof(ccv_dense_matrix_t) + sizeof(cbuf_matrix_t);
-	printc("sz = %d, cbuf_size = %d\n", sz, cbuf_size);
 	cbufp_t cb;
 	ccv_dense_matrix_t *mat = NULL;
 	cbuf_matrix_t *cbuf_mat = NULL;

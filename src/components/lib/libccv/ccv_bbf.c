@@ -1425,14 +1425,14 @@ ccv_bbf_classifier_cascade_t* ccv_bbf_read_classifier_cascade(const char* direct
 {
 	char buf[1024];
 	sprintf(buf, "%s/cascade.txt", directory);
+	printc("read cascade file, dir = %s\n", directory);
 	int s, i;
 	FILE* r = fopen(buf, "r");
 	if (r == 0)
 		return 0;
-	printc("go to alloc memory\n");
 	ccv_bbf_classifier_cascade_t* cascade = (ccv_bbf_classifier_cascade_t*)ccmalloc(sizeof(ccv_bbf_classifier_cascade_t));
-	printc("alloc done\n");
 	s = fscanf(r, "%d %d %d", &cascade->count, &cascade->size.width, &cascade->size.height);
+	printc("cascade->count = %d\n", cascade->count);
 	assert(s > 0);
 	cascade->stage_classifier = (ccv_bbf_stage_classifier_t*)ccmalloc(cascade->count * sizeof(ccv_bbf_stage_classifier_t));
 	for (i = 0; i < cascade->count; i++)

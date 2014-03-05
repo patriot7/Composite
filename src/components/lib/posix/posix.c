@@ -9,6 +9,7 @@
 
 extern void *do_mmap(size_t);
 extern int do_munmap(void*, size_t);
+extern td_t fs_tsplit(spdid_t spdid, td_t td, char *param, int len, tor_flags_t tflags, long evtid);
 
 typedef long (*cos_syscall_t)(long a, long b, long c, long d, long e, long f);
 cos_syscall_t cos_syscalls[SYSCALLS_NUM];
@@ -37,7 +38,7 @@ cos_open(const char *pathname, int flags, int mode)
         long evt;
         evt = evt_split(cos_spd_id(), 0, 0);
         assert(evt > 0);
-        td = tsplit(cos_spd_id(), td_root, (char *)pathname, strlen(pathname), TOR_ALL, evt);
+        td = fs_tsplit(cos_spd_id(), td_root, (char *)pathname, strlen(pathname), TOR_ALL, evt);
 
         if (td <= 0) {
                 printc("open() failed!\n");

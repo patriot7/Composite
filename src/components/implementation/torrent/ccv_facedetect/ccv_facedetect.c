@@ -22,14 +22,19 @@ td_t
 tsplit(spdid_t spdid, td_t td, char *param,
        int len, tor_flags_t tflags, long evtid) 
 {
+        printc("called ccv_fd_tsplit\n");
+        printc("calling spd = %d\n", spdid);
+        printc("enter tsplit, td_root = %d, td = %d\n", td_root, td);
+        printc("param = %s\n", param);
         td_t ret = -1;
         struct torrent *nt;
 
         if (td != td_root) return -EINVAL;
 
         nt = tor_alloc(NULL, tflags);
-        /*ccv_bbf_classifier_cascade_t* cascade = ccv_bbf_read_classifier_cascade("face"); [> TODO: the dirname should be put into param <]*/
-        /*nt->data = cascade;*/
+        ccv_bbf_classifier_cascade_t* cascade = ccv_bbf_read_classifier_cascade("face");
+        printc("finished reading\n");
+        nt->data = cascade;
         if (!nt) ERR_THROW(-ENOMEM, done);
         ret = nt->td;
 
@@ -53,22 +58,19 @@ trelease(spdid_t spdid, td_t td)
 int 
 tread(spdid_t spdid, td_t td, int cbid, int sz)
 {
-        return -1;
+        return -ENOSYS;
 }
 
 int
 treadp(spdid_t spdid, td_t td, int *off, int *len)
 {
-        int ret = -1;
-
-	return ret;
+       return -ENOSYS;
 }
 
 int 
 twrite(spdid_t spdid, td_t td, int cbid, int sz)
 {
-
-        return -1;
+       return -ENOSYS;
 }
 
 int
@@ -80,7 +82,7 @@ twritep(spdid_t spdid, td_t td, int cbid, int sz)
         char *buf;
         ccv_bbf_classifier_cascade_t* cascade;
         struct torrent *t;
-        ccv_dense_matrix_t *ccv_mat_input = NULL;
+        ccv_dense_matrix_t *ccv_mat_input;
 
         if (tor_isnull(td)) return -EINVAL;
 
@@ -96,7 +98,12 @@ twritep(spdid_t spdid, td_t td, int cbid, int sz)
 
         ccv_array_t* seq;
         seq = ccv_bbf_detect_objects(ccv_mat_input, &cascade, 1, ccv_bbf_default_params);
-        printc("detect %d faces\n", seq->rnum);
+        printc("detect %d faces:\n", seq->rnum);
+        int i;
+        for (i = 0; i < seq->rnum; i++) {
+               ccv_comp_t* comp = (ccv_comp_t*)ccv_array_get(seq, i);
+               printc("%d %d %d %d %f\n", comp->rect.x, comp->rect.y, comp->rect.width, comp->rect.height, comp->confidence);
+        }
         ccv_array_free(seq);
 
         /*cbuf_matrix_t *cbuf_mat = ccv2cbufmat(ccv_mat_output);*/
