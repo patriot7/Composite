@@ -9,7 +9,6 @@
 #include "../../../lib/libccv/cbuf_ccv.h"
 
 extern td_t ccv_fd_tsplit(spdid_t spdid, td_t td, char *param, int len, tor_flags_t tflags, long evtid);
-extern td_t fs_tsplit(spdid_t spdid, td_t td, char *param, int len, tor_flags_t tflags, long evtid);
 
 void
 cos_init(void)
@@ -23,8 +22,7 @@ cos_init(void)
         td_t td;
 
         evt_tsplit = evt_split(cos_spd_id(), 0, 0);
-        char *dir_name = "face";
-        td = ccv_fd_tsplit(cos_spd_id(), td_root, dir_name, strlen(dir_name), TOR_ALL, evt_tsplit);
+        td = ccv_fd_tsplit(cos_spd_id(), td_root, "face", strlen("face"), TOR_ALL, evt_tsplit);
         printc("tsplit finished\n");
 
         /*ccv_dense_matrix_t *mat = NULL;*/

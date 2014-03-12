@@ -10,9 +10,51 @@
 extern void *do_mmap(size_t);
 extern int do_munmap(void*, size_t);
 extern td_t fs_tsplit(spdid_t spdid, td_t td, char *param, int len, tor_flags_t tflags, long evtid);
+extern int fs_trmeta(spdid_t spdid, td_t td, const char *key, unsigned int klen, char *retval, unsigned int max_rval_len);
+extern int fs_twmeta(spdid_t spdid, td_t td, const char *key, unsigned int klen, const char *val, unsigned int vlen);
+extern int tread(spdid_t spdid, td_t td, int cbid, int sz);
+extern int twrite(spdid_t spdid, td_t td, int cbid, int sz);
 
 typedef long (*cos_syscall_t)(long a, long b, long c, long d, long e, long f);
 cos_syscall_t cos_syscalls[SYSCALLS_NUM];
+
+static inline int
+fs_tread_pack(spdid_t spdid, td_t td, char *data, int len)
+{
+	cbuf_t cb;
+	char *d;
+	int ret;
+
+	d = cbuf_alloc(len, &cb);
+	if (!d) return -1;
+
+	ret = fs_tread(spdid, td, cb, len);
+        if (ret < 0) goto free;
+        if (ret > len) {
+                ret = len; /* FIXME: this is broken, and we should figure out a better solution */
+        }
+	memcpy(data, d, ret);
+free:
+	cbuf_free(d);	
+	return ret;
+}
+
+static inline int
+fs_twrite_pack(spdid_t spdid, td_t td, char *data, int len)
+{
+	cbuf_t cb;
+	char *d;
+	int ret;
+
+	d = cbuf_alloc(len, &cb);
+	if (!d) return -1;
+
+	memcpy(d, data, len);
+	ret = fs_twrite(spdid, td, cb, len);
+	cbuf_free(d);
+	
+	return ret;
+}
 
 __attribute__((regparm(1))) long
 __cos_syscall(int syscall_num, long a, long b, long c, long d, long e, long f)
@@ -34,14 +76,16 @@ int
 cos_open(const char *pathname, int flags, int mode)
 {
         /* mode param is only for O_CREAT in flags */
-        td_t td;
+        td_t td = -7;
         long evt;
         evt = evt_split(cos_spd_id(), 0, 0);
         assert(evt > 0);
+        printc("call fs_tsplit: %p\n", fs_tsplit);
         td = fs_tsplit(cos_spd_id(), td_root, (char *)pathname, strlen(pathname), TOR_ALL, evt);
+        printc("td = %d\n", td);
 
         if (td <= 0) {
-                printc("open() failed!\n");
+                printc("open(\"%s\", %d, %d) failed!\n", pathname, flags, mode);
                 assert(0);
         }
 
@@ -51,6 +95,7 @@ cos_open(const char *pathname, int flags, int mode)
 int
 cos_close(int fd)
 {
+        printc("called cos_close\n");
         trelease(cos_spd_id(), fd - 3); /* return void, use tor_lookup? */
 
         return 0; /* return -1 if failed */
@@ -59,7 +104,8 @@ cos_close(int fd)
 ssize_t
 cos_read(int fd, void *buf, size_t count)
 {
-        int ret = tread_pack(cos_spd_id(), fd - 3, buf, count);
+        printc("call tread_pack\n");
+        int ret = fs_tread_pack(cos_spd_id(), fd - 3, buf, count);
 
         return ret;
 }
@@ -75,7 +121,7 @@ cos_write(int fd, const void *buf, size_t count)
                 return 0;
         } else {
                 int td = fd - 3;
-                int ret = twrite_pack(cos_spd_id(), td, (char *)buf, count);
+                int ret = fs_twrite_pack(cos_spd_id(), td, (char *)buf, count);
                 return ret;
         }
 }
@@ -83,6 +129,7 @@ cos_write(int fd, const void *buf, size_t count)
 void *
 cos_mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)
 {
+        printc("called cos_mmap\n");
         if (addr != NULL) {
                 printc("parameter void *addr is not supported!\n");
                 assert(0);
@@ -105,6 +152,7 @@ cos_mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)
 int
 cos_munmap(void *start, size_t length)
 {
+        printc("called cos_munmap\n");
         int ret = do_munmap(start, length);
         assert(ret == -1);
 
@@ -114,6 +162,7 @@ cos_munmap(void *start, size_t length)
 void *
 cos_mremap(void *old_address, size_t old_size, size_t new_size, int flags)
 {
+        printc("called cos_mremap\n");
         do_munmap(old_address, old_size);
 
         return do_mmap(new_size);
@@ -122,6 +171,7 @@ cos_mremap(void *old_address, size_t old_size, size_t new_size, int flags)
 off_t
 cos_lseek(int fd, off_t offset, int whence)
 {
+        printc("called cos_lseek\n");
         /* TODO: we can use a simpler twmeta_pack(td_t td, const char *key, const char *val) */
         char val[8]; /* TODO: length number need to be selected */
         int ret = -1;
@@ -129,14 +179,14 @@ cos_lseek(int fd, off_t offset, int whence)
 
         if (whence == SEEK_SET) {
                 snprintf(val, 8, "%ld", offset);
-                ret = twmeta(cos_spd_id(), td, "offset", strlen("offset"), val, strlen(val));
+                ret = fs_twmeta(cos_spd_id(), td, "offset", strlen("offset"), val, strlen(val));
                 assert(ret == 0);
         } else if (whence == SEEK_CUR) {
                 /* TODO: return value not checked */
                 char offset_curr[8];
-                trmeta(cos_spd_id(), td, "offset", strlen("offset"), offset_curr, 8);
+                fs_trmeta(cos_spd_id(), td, "offset", strlen("offset"), offset_curr, 8);
                 snprintf(val, 8, "%ld", atol(offset_curr) + offset);
-                ret = twmeta(cos_spd_id(), td, "offset", strlen("offset"), val, strlen(val));
+                ret = fs_twmeta(cos_spd_id(), td, "offset", strlen("offset"), val, strlen(val));
                 assert(ret == 0);
         } else if (whence == SEEK_END) {
                 printc("lseek::SEEK_END not implemented !\n");

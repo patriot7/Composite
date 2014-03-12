@@ -18,23 +18,25 @@
 
 #include "../../../lib/libccv/cbuf_ccv.h"
 
+
+extern td_t 
+fs_tsplit(spdid_t spdid, td_t td, char *param,
+       int len, tor_flags_t tflags, long evtid); 
+
 td_t 
 tsplit(spdid_t spdid, td_t td, char *param,
        int len, tor_flags_t tflags, long evtid) 
 {
         printc("called ccv_fd_tsplit\n");
-        printc("calling spd = %d\n", spdid);
-        printc("enter tsplit, td_root = %d, td = %d\n", td_root, td);
-        printc("param = %s\n", param);
         td_t ret = -1;
         struct torrent *nt;
 
         if (td != td_root) return -EINVAL;
 
         nt = tor_alloc(NULL, tflags);
-        ccv_bbf_classifier_cascade_t* cascade = ccv_bbf_read_classifier_cascade("face");
+        ccv_bbf_classifier_cascade_t* cascade = ccv_bbf_read_classifier_cascade(param);
         printc("finished reading\n");
-        nt->data = cascade;
+        /*nt->data = cascade;*/
         if (!nt) ERR_THROW(-ENOMEM, done);
         ret = nt->td;
 
