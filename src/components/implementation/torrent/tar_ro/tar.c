@@ -27,8 +27,6 @@ td_t
 tsplit(spdid_t spdid, td_t td, char *param, 
        int len, tor_flags_t tflags, long evtid) 
 {
-        printc("called fs_tsplit\n");
-
 	td_t ret = -1;
 	struct torrent *t, *nt;
 	struct fsobj *fso, *fsc, *parent; /* obj, child, and parent */

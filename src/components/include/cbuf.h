@@ -227,7 +227,6 @@ cbuf_unpack(cbuf_t cb, u32_t *cbid)
 	
 	cu.v  = cb;
 	*cbid = cu.c.id;
-	printc("cu.c.aggregate = %d\n", (int)cu.c.aggregate);
 	assert(!cu.c.aggregate);
 	return;
 }
@@ -428,6 +427,7 @@ __cbuf_alloc(unsigned int sz, cbuf_t *cb, int tmem)
 		sz = nlepow2(round_up_to_page(sz));
 		fl = __cbufp_freelist_get(sz);
 	}
+	printc("take lock\n");
 	CBUF_TAKE();
 again:
 	d = FIRST_LIST(fl, next, prev);

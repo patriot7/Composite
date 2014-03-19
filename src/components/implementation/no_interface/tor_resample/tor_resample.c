@@ -27,8 +27,6 @@ cos_init(void)
         assert(mat);
 
         cbuf_matrix_t *cbuf_mat = ccv2cbufmat(mat);
-	printc("address = %p\n", cbuf_mat->data);
-        printc("mycomp cbid = %d\n", cbuf_mat->cbid);
         cbufp_send_deref(cbuf_mat->cbid);
         ccv_res_twritep(cos_spd_id(), td, cbuf_mat->cbid, cbuf_mat->size);
 

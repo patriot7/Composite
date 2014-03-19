@@ -1,12 +1,11 @@
-C_OBJS=posix_test.o
+C_OBJS=ccv_edgedetect.o
 ASM_OBJS=
-COMPONENT=posix_t.o
-INTERFACES=
-DEPENDENCIES=sched printc timed_blk torrent cbufp cbuf_c evt mem_mgr_large valloc lock
+COMPONENT=ccv_ed.o
+INTERFACES=torrent
+DEPENDENCIES=printc cbufp cbuf_c evt lock mem_mgr_large valloc
 IF_LIB=./cos_libccv.a $(DIETDIR)/bin-i386/libm.a
 OBJLIBS += $(POSIX_LIB)
-
-FN_PREPEND=fs_
+FN_PREPEND=fs_ next_stage_
 
 pre: first all
 first:

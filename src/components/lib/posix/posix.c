@@ -80,9 +80,7 @@ cos_open(const char *pathname, int flags, int mode)
         long evt;
         evt = evt_split(cos_spd_id(), 0, 0);
         assert(evt > 0);
-        printc("call fs_tsplit: %p\n", fs_tsplit);
         td = fs_tsplit(cos_spd_id(), td_root, (char *)pathname, strlen(pathname), TOR_ALL, evt);
-        printc("td = %d\n", td);
 
         if (td <= 0) {
                 printc("open(\"%s\", %d, %d) failed!\n", pathname, flags, mode);
@@ -95,7 +93,6 @@ cos_open(const char *pathname, int flags, int mode)
 int
 cos_close(int fd)
 {
-        printc("called cos_close\n");
         trelease(cos_spd_id(), fd - 3); /* return void, use tor_lookup? */
 
         return 0; /* return -1 if failed */
@@ -104,7 +101,6 @@ cos_close(int fd)
 ssize_t
 cos_read(int fd, void *buf, size_t count)
 {
-        printc("call tread_pack\n");
         int ret = fs_tread_pack(cos_spd_id(), fd - 3, buf, count);
 
         return ret;
@@ -129,7 +125,6 @@ cos_write(int fd, const void *buf, size_t count)
 void *
 cos_mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)
 {
-        printc("called cos_mmap\n");
         if (addr != NULL) {
                 printc("parameter void *addr is not supported!\n");
                 assert(0);
@@ -162,7 +157,6 @@ cos_munmap(void *start, size_t length)
 void *
 cos_mremap(void *old_address, size_t old_size, size_t new_size, int flags)
 {
-        printc("called cos_mremap\n");
         do_munmap(old_address, old_size);
 
         return do_mmap(new_size);
@@ -171,7 +165,6 @@ cos_mremap(void *old_address, size_t old_size, size_t new_size, int flags)
 off_t
 cos_lseek(int fd, off_t offset, int whence)
 {
-        printc("called cos_lseek\n");
         /* TODO: we can use a simpler twmeta_pack(td_t td, const char *key, const char *val) */
         char val[8]; /* TODO: length number need to be selected */
         int ret = -1;

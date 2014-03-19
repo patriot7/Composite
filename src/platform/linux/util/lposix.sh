@@ -20,6 +20,6 @@ tp.o-sm.o|buf.o|bufp.o|print.o|te.o|fprr.o|mm.o|va.o|mpool.o;\
 vm.o-fprr.o|print.o|mm.o|l.o|boot.o;\
 va.o-fprr.o|print.o|mm.o|l.o|boot.o|vm.o;\
 rotar.o-sm.o|fprr.o|print.o|mm.o|buf.o|bufp.o|l.o|eg.o|va.o|initfs.o;\
-posix_t.o-sm.o|fprr.o|buf.o|bufp.o|mm.o|eg.o|va.o|l.o|print.o|rotar.o;\
+posix_t.o-sm.o|fprr.o|buf.o|bufp.o|mm.o|eg.o|va.o|l.o|print.o|[fs_]rotar.o;\
 trans.o-sm.o|fprr.o|l.o|buf.o|bufp.o|mm.o|va.o|eg.o|print.o\
 " ./gen_client_stub

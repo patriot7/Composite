@@ -27,7 +27,6 @@ td_t
 tsplit(spdid_t spdid, td_t td, char *param,
        int len, tor_flags_t tflags, long evtid) 
 {
-        printc("called ccv_fd_tsplit\n");
         td_t ret = -1;
         struct torrent *nt;
 
@@ -35,8 +34,7 @@ tsplit(spdid_t spdid, td_t td, char *param,
 
         nt = tor_alloc(NULL, tflags);
         ccv_bbf_classifier_cascade_t* cascade = ccv_bbf_read_classifier_cascade(param);
-        printc("finished reading\n");
-        /*nt->data = cascade;*/
+        nt->data = cascade;
         if (!nt) ERR_THROW(-ENOMEM, done);
         ret = nt->td;
 
@@ -99,6 +97,7 @@ twritep(spdid_t spdid, td_t td, int cbid, int sz)
         ccv_mat_input = cbuf2ccvmat((cbuf_matrix_t *)buf);
 
         ccv_array_t* seq;
+        printc("begin fd\n");
         seq = ccv_bbf_detect_objects(ccv_mat_input, &cascade, 1, ccv_bbf_default_params);
         printc("detect %d faces:\n", seq->rnum);
         int i;

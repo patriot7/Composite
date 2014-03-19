@@ -21,18 +21,26 @@ cos_init(void)
         long evt_tsplit;
         td_t td;
 
+
+        /*cbufp_t cb_test[10];*/
+
+        /*int i = 0;*/
+        /*for (i = 0; i < 10; i++) {*/
+                /*cbufp_alloc(200*1024, &(cb_test[i]));*/
+        /*}*/
+
         evt_tsplit = evt_split(cos_spd_id(), 0, 0);
         td = ccv_fd_tsplit(cos_spd_id(), td_root, "face", strlen("face"), TOR_ALL, evt_tsplit);
-        printc("tsplit finished\n");
 
-        /*ccv_dense_matrix_t *mat = NULL;*/
-        /*ccv_read("photo.bmp", &mat, CCV_IO_ANY_FILE | CCV_IO_GRAY);*/
-        /*assert(mat);*/
-        /*printc("ccv_read finished\n");*/
+        ccv_dense_matrix_t *mat = NULL;
+        ccv_read("photo.bmp", &mat, CCV_IO_ANY_FILE | CCV_IO_GRAY);
+        assert(mat);
+        printc("ccv_read finished\n");
 
-        /*cbuf_matrix_t *cbuf_mat = ccv2cbufmat(mat);*/
+        cbuf_matrix_t *cbuf_mat = ccv2cbufmat(mat);
         /*cbufp_send_deref(cbuf_mat->cbid);*/
-        /*ccv_fd_twritep(cos_spd_id(), td, cbuf_mat->cbid, cbuf_mat->size);*/
+        cbufp_send(cbuf_mat->cbid);
+        ccv_fd_twritep(cos_spd_id(), td, cbuf_mat->cbid, cbuf_mat->size);
 
         /*cbufp_t cbid;*/
         /*int off, len;*/

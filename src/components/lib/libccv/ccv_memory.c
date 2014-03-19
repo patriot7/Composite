@@ -27,6 +27,7 @@ static __thread int ccv_cache_opt = 0;
 
 ccv_dense_matrix_t* ccv_dense_matrix_new(int rows, int cols, int type, void* data, uint64_t sig)
 {
+	printc("rows: %d, cols: %d, type: %d, data %p, sig %llu\n", rows, cols, type, data, sig);
 	ccv_dense_matrix_t* mat;
 	if (ccv_cache_opt && sig != 0 && !data && !(type & CCV_NO_DATA_ALLOC))
 	{
@@ -78,15 +79,17 @@ ccv_dense_matrix_t* ccv_dense_matrix_renew(ccv_dense_matrix_t* x, int rows, int 
 {
 	if (x != 0)
 	{
+		assert(0);
 		assert(x->rows == rows && x->cols == cols && (CCV_GET_DATA_TYPE(x->type) & types) && (CCV_GET_CHANNEL(x->type) == CCV_GET_CHANNEL(types)));
 		prefer_type = CCV_GET_DATA_TYPE(x->type) | CCV_GET_CHANNEL(x->type);
 	}
-	if (sig != 0)
-		sig = ccv_cache_generate_signature((const char*)&prefer_type, sizeof(int), sig, CCV_EOF_SIGN);
+	/*if (sig != 0)*/
+		/*sig = ccv_cache_generate_signature((const char*)&prefer_type, sizeof(int), sig, CCV_EOF_SIGN);*/
 	if (x == 0)
 	{
 		x = ccv_dense_matrix_new(rows, cols, prefer_type, 0, sig);
 	} else {
+		assert(0);
 		x->sig = sig;
 	}
 	return x;
