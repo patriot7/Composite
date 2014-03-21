@@ -427,7 +427,6 @@ __cbuf_alloc(unsigned int sz, cbuf_t *cb, int tmem)
 		sz = nlepow2(round_up_to_page(sz));
 		fl = __cbufp_freelist_get(sz);
 	}
-	printc("take lock\n");
 	CBUF_TAKE();
 again:
 	d = FIRST_LIST(fl, next, prev);

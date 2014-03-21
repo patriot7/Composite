@@ -33,10 +33,8 @@ cbuf_ccv_alloc(unsigned int sz)
 
 	mat = (ccv_dense_matrix_t *)malloc(sizeof(ccv_dense_matrix_t));
 	assert(mat);
-	/*printc("cbufp_alloc\n");*/
 	printc("comp %d called cbufp\n", cos_spd_id());
 	cbuf_mat = (cbuf_matrix_t *)cbufp_alloc(cbuf_size, &cb);
-	/*printc("cbufp_alloc pass\n");*/
 	assert(cbuf_mat);
 
 	cbuf_mat->cbid = cb;
