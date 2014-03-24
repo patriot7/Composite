@@ -286,7 +286,11 @@ static void evt_callback(struct sched_thd *t, u8_t flags, u32_t cpu_usage)
 			report_event(ACAP_ACTIVE);
 			fp_activate_upcall(t);
 		} else if (flags & COS_SCHED_EVT_ACAP_READY) {
-			assert(sched_get_current() != t);
+			/*assert(sched_get_current() != t);*/
+			if (sched_get_current() == t) {
+				printc("sched_get_current() = %d, t = %d\n", sched_get_current(), t);
+				while (1 == 1) ;
+			}
 			report_event(ACAP_READY);
 			fp_deactivate_upcall(t);
 		} else if (flags & COS_SCHED_EVT_ACAP_PEND) {

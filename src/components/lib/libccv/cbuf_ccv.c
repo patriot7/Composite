@@ -59,6 +59,7 @@ set_cbuf_header(ccv_dense_matrix_t *mat)
 void
 cbuf_ccv_free(void *ptr)
 {
+	printc("cbuf_ccv_free\n");
 	ccv_dense_matrix_t *mat = NULL;
 	cbuf_matrix_t *cbufp_mat = NULL;
 

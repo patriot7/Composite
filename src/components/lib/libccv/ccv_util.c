@@ -1002,7 +1002,9 @@ typedef struct ccv_ptree_node_t
 int ccv_array_group(ccv_array_t* array, ccv_array_t** index, ccv_array_group_f gfunc, void* data)
 {
 	int i, j;
+	printc("ccmalloc\n");
 	ccv_ptree_node_t* node = (ccv_ptree_node_t*)ccmalloc(array->rnum * sizeof(ccv_ptree_node_t));
+	printc("ccmalloc done\n");
 	for (i = 0; i < array->rnum; i++)
 	{
 		node[i].parent = 0;
