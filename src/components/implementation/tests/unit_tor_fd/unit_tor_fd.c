@@ -21,13 +21,12 @@ cos_init(void)
         long evt_tsplit;
         td_t td;
 
-
-        /*cbufp_t cb_test[10];*/
-
-        /*int i = 0;*/
-        /*for (i = 0; i < 10; i++) {*/
-                /*cbufp_alloc(200*1024, &(cb_test[i]));*/
-        /*}*/
+        /*int i;*/
+        /*void *test[100];*/
+        /*for (i = 0; i < 100; i++)*/
+                /*test[i] = malloc(1024*1024);*/
+        /*for (i = 0; i < 100; i++)*/
+                /*free(test[i]);*/
 
         evt_tsplit = evt_split(cos_spd_id(), 0, 0);
         td = ccv_fd_tsplit(cos_spd_id(), td_root, "face", strlen("face"), TOR_ALL, evt_tsplit);
@@ -38,9 +37,9 @@ cos_init(void)
         printc("ccv_read finished\n");
 
         cbuf_matrix_t *cbuf_mat = ccv2cbufmat(mat);
-        /*cbufp_send_deref(cbuf_mat->cbid);*/
-        cbufp_send(cbuf_mat->cbid);
+        cbufp_send_deref(cbuf_mat->cbid);
         ccv_fd_twritep(cos_spd_id(), td, cbuf_mat->cbid, cbuf_mat->size);
+        //
 
         /*cbufp_t cbid;*/
         /*int off, len;*/

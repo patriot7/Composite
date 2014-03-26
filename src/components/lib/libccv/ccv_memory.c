@@ -3,6 +3,7 @@
 #include "3rdparty/sha1/sha1.h"
 
 #define __thread
+
 #define CBUF_ENABLE
 
 #ifdef CBUF_ENABLE
@@ -12,6 +13,7 @@
 #define ccfree cbuf_ccv_free
 /*cbufp_ccv_alloc_creator(ccmalloc);*/
 /*cbufp_ccv_free_creator(ccfree);*/
+
 #endif
 
 static __thread ccv_cache_t ccv_cache;
@@ -76,19 +78,20 @@ ccv_dense_matrix_t* ccv_dense_matrix_new(int rows, int cols, int type, void* dat
 
 ccv_dense_matrix_t* ccv_dense_matrix_renew(ccv_dense_matrix_t* x, int rows, int cols, int types, int prefer_type, uint64_t sig)
 {
-	if (x != 0)
-	{
-		assert(x->rows == rows && x->cols == cols && (CCV_GET_DATA_TYPE(x->type) & types) && (CCV_GET_CHANNEL(x->type) == CCV_GET_CHANNEL(types)));
-		prefer_type = CCV_GET_DATA_TYPE(x->type) | CCV_GET_CHANNEL(x->type);
-	}
-	if (sig != 0)
-		sig = ccv_cache_generate_signature((const char*)&prefer_type, sizeof(int), sig, CCV_EOF_SIGN);
-	if (x == 0)
-	{
+	/*if (x != 0)*/
+	/*{*/
+		/*assert(0);*/
+		/*assert(x->rows == rows && x->cols == cols && (CCV_GET_DATA_TYPE(x->type) & types) && (CCV_GET_CHANNEL(x->type) == CCV_GET_CHANNEL(types)));*/
+		/*prefer_type = CCV_GET_DATA_TYPE(x->type) | CCV_GET_CHANNEL(x->type);*/
+	/*}*/
+	/*if (sig != 0)*/
+		/*sig = ccv_cache_generate_signature((const char*)&prefer_type, sizeof(int), sig, CCV_EOF_SIGN);*/
+	/*if (x == 0)*/
+	/*{*/
 		x = ccv_dense_matrix_new(rows, cols, prefer_type, 0, sig);
-	} else {
-		x->sig = sig;
-	}
+	/*} else {*/
+		/*x->sig = sig;*/
+	/*}*/
 	return x;
 }
 
@@ -162,6 +165,7 @@ void ccv_matrix_free_immediately(ccv_matrix_t* mat)
 		dmt->refcount = 0;
 		ccfree(dmt);
 	} else if (type & CCV_MATRIX_SPARSE) {
+		assert(0); /* doesn't support CCV_MATRIX_SPARSE WHEN USING CBUF */ 
 		ccv_sparse_matrix_t* smt = (ccv_sparse_matrix_t*)mat;
 		int i;
 		for (i = 0; i < CCV_GET_SPARSE_PRIME(smt->prime); i++)
@@ -181,6 +185,7 @@ void ccv_matrix_free_immediately(ccv_matrix_t* mat)
 		ccfree(smt->vector);
 		ccfree(smt);
 	} else if ((type & CCV_MATRIX_CSR) || (type & CCV_MATRIX_CSC)) {
+		assert(0); /* doesn't support WHEN USING CBUF */ 
 		ccv_compressed_sparse_matrix_t* csm = (ccv_compressed_sparse_matrix_t*)mat;
 		csm->refcount = 0;
 		ccfree(csm);

@@ -105,6 +105,7 @@ err_free1:
 
 void *valloc_alloc(spdid_t spdid, spdid_t dest, unsigned long npages)
 {
+	printc("valloc_alloc %lu pages\n", npages);
 	void *ret = NULL;
 	struct spd_vas_tracker *trac;
 	struct spd_vas_occupied *occ;
@@ -131,6 +132,7 @@ void *valloc_alloc(spdid_t spdid, spdid_t dest, unsigned long npages)
                         off = bitmap_extent_find_set(&occ->pgd_occupied[0], 0, npages, MAP_MAX);
                         if (off < 0) continue;
                         ret = (void *)((char *)trac->extents[i].start + off * PAGE_SIZE);
+			printc("found available space, use spd_location %d\n", i);
                         goto done;
                 }
 
@@ -143,16 +145,19 @@ void *valloc_alloc(spdid_t spdid, spdid_t dest, unsigned long npages)
                 bitmap_set_contig(&occ->pgd_occupied[0], 0, ext_size, 1);
                 bitmap_set_contig(&occ->pgd_occupied[0], 0, npages, 0);
                 ret = trac->extents[i].start;
+		printc("not found available space in previous extent, use extents[%d]\n", i);
                 break;
         }
 
-done:   
+done:
 	UNLOCK();
+	printc("valloc_alloc return address %p\n", ret);
 	return ret;
 }
 
 int valloc_free(spdid_t spdid, spdid_t dest, void *addr, unsigned long npages)
 {
+	printc("valloc_free\n");
 	int ret = -1;
 	struct spd_vas_tracker *trac;
 	struct spd_vas_occupied *occ;
@@ -171,7 +176,7 @@ int valloc_free(spdid_t spdid, spdid_t dest, void *addr, unsigned long npages)
                 assert(off + npages < MAP_MAX * sizeof(u32_t));
                 bitmap_set_contig(&occ->pgd_occupied[0], off, npages, 1);
                 ret = 0;
-                goto done;
+		break;
         }
 done:	
 	UNLOCK();

@@ -147,7 +147,6 @@ cos_mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)
 int
 cos_munmap(void *start, size_t length)
 {
-        printc("called cos_munmap\n");
         int ret = do_munmap(start, length);
         assert(ret == -1);
 

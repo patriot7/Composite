@@ -416,14 +416,15 @@ void ccv_sample_down(ccv_dense_matrix_t* a, ccv_dense_matrix_t** b, int type, in
 					_for_set(row, dx + k, _for_get_a(a_ptr, dx * 2 + sx + k, 0) * 6 + (_for_get_a(a_ptr, dx * 2 + sx + k - ch, 0) + _for_get_a(a_ptr, dx * 2 + sx + k + ch, 0)) * 4 + _for_get_a(a_ptr, dx * 2 + sx + k - ch * 2, 0) + _for_get_a(a_ptr, dx * 2 + sx + k + ch * 2, 0), 0); \
 			x_block(_for_get_a, _for_set, _for_get, _for_set_b); \
 		} \
-		unsigned char **rows = (unsigned char **)malloc(sizeof(unsigned char *) * 5); \
+		/*unsigned char **rows = (unsigned char **)malloc(sizeof(unsigned char *) * 5); \*/ \
+		unsigned char *rows[5]; \
 		for(k = 0; k < 5; k++) \
 			rows[k] = buf + ((dy * 2 + k) % 5) * bufstep; \
 		for(dx = 0; dx < db->cols * ch; dx++) \
 			_for_set_b(b_ptr, dx, (_for_get(rows[2], dx, 0) * 6 + (_for_get(rows[1], dx, 0) + _for_get(rows[3], dx, 0)) * 4 + _for_get(rows[0], dx, 0) + _for_get(rows[4], dx, 0)) / 256, 0); \
-		free(rows); \
 		b_ptr += db->step; \
-	}
+		/*free(rows); \*/ \
+	} 
 	int no_8u_type = (a->type & CCV_8U) ? CCV_32S : a->type;
 	if (src_x > 0)
 	{

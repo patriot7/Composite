@@ -1282,7 +1282,7 @@ ccv_array_t* ccv_bbf_detect_objects(ccv_dense_matrix_t* a, ccv_bbf_classifier_ca
 			scale_x *= scale;
 			scale_y *= scale;
 		}
-		printc("detect in multi scale done\n");
+		printc("multi scale done\n");
 
 		/* the following code from OpenCV's haar feature implementation */
 		if(params.min_neighbors == 0)
@@ -1300,7 +1300,6 @@ ccv_array_t* ccv_bbf_detect_objects(ccv_dense_matrix_t* a, ccv_bbf_classifier_ca
 			int ncomp = ccv_array_group(seq, &idx_seq, _ccv_is_equal_same_class, 0);
 			printc("group array done\n");
 			ccv_comp_t* comps = (ccv_comp_t*)ccmalloc((ncomp + 1) * sizeof(ccv_comp_t));
-			printc("malloc done\n");
 			memset(comps, 0, (ncomp + 1) * sizeof(ccv_comp_t));
 
 			// count number of neighbors

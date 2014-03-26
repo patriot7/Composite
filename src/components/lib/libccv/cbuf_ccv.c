@@ -32,9 +32,10 @@ cbuf_ccv_alloc(unsigned int sz)
 	cbuf_matrix_t *cbuf_mat = NULL;
 
 	mat = (ccv_dense_matrix_t *)malloc(sizeof(ccv_dense_matrix_t));
+	printc("ccv_cbufp_alloc: mat = %p\n", mat);
 	assert(mat);
-	printc("comp %d called cbufp\n", cos_spd_id());
 	cbuf_mat = (cbuf_matrix_t *)cbufp_alloc(cbuf_size, &cb);
+	printc("ccv_cbufp_alloc %d bytes, cbid %d\n", cbuf_size, cb);
 	assert(cbuf_mat);
 
 	cbuf_mat->cbid = cb;
@@ -59,13 +60,13 @@ set_cbuf_header(ccv_dense_matrix_t *mat)
 void
 cbuf_ccv_free(void *ptr)
 {
-	printc("cbuf_ccv_free\n");
 	ccv_dense_matrix_t *mat = NULL;
 	cbuf_matrix_t *cbufp_mat = NULL;
 
 	mat = (ccv_dense_matrix_t *)ptr;
 	cbufp_mat = (cbuf_matrix_t *)(mat - sizeof(cbuf_matrix_t));
 
+	printc("ccv_cbufp_free cbid %d\n", cbufp_mat->cbid);
 	cbufp_deref(cbufp_mat->cbid);
 	free(mat);
 

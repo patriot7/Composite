@@ -276,16 +276,26 @@ mapping_crt(struct mapping *p, struct frame *f, spdid_t dest, vaddr_t to, int fl
 
 	/* no vas structure for this spd yet... */
 	if (!cv) {
+		printc("alloc a new vas structure\n");
 		cv = cvas_alloc(dest);
-		if (!cv) goto done;
+		if (!cv) {
+			printc("cvas_alloc failed\n");
+			goto done;
+		}
 		assert(cv == cvas_lookup(dest));
 	}
 	assert(cv->pages);
-	if (cvect_lookup(cv->pages, idx)) goto collision;
+	if (cvect_lookup(cv->pages, idx)){
+		printc("collision\n");
+		goto collision;
+	}
 
 	cvas_ref(cv);
 	m = cslab_alloc_mapping();
-	if (!m) goto collision;
+	if (!m) {
+		printc("cslab_alloc_mapping() failed\n");
+		goto collision;
+	}
 
 	if (cos_mmap_cntl(COS_MMAP_GRANT, flags, dest, to, frame_index(f))) {
 		printc("mem_man: could not grant at %x:%d\n", dest, (int)to);
@@ -346,6 +356,7 @@ __mapping_destroy(struct mapping *m)
 
 	idx = cos_mmap_cntl(COS_MMAP_REVOKE, 0, m->spdid, m->addr, 0);
 	assert(idx == frame_index(m->f));
+	printc("frame_deref 1\n");
 	frame_deref(m->f);
 	cslab_free_mapping(m);
 }
@@ -406,6 +417,7 @@ done:
 	UNLOCK();
 	return ret;
 dealloc:
+	printc("frame_deref 2\n");
 	frame_deref(f);
 	goto done;		/* -EINVAL */
 }

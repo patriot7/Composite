@@ -96,6 +96,7 @@ vas_mgr_expand(spdid_t spd, spdid_t dest, unsigned long amnt)
 	}
 done:
 	UNLOCK();
+	printc("vas_mgr_expand(): %p\n", ret);
 	return ret;
 }
 
