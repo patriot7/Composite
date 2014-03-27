@@ -15,13 +15,12 @@
 #include <cos_alloc.h>
 #include <cos_map.h>
 #include <stdlib.h>
-
 #include "../../../lib/libccv/cbuf_ccv.h"
 
+cbuf_matrix_t *cbuf_mat_tmp;
 
-extern td_t 
-fs_tsplit(spdid_t spdid, td_t td, char *param,
-       int len, tor_flags_t tflags, long evtid); 
+extern td_t next_stage_tsplit(spdid_t spdid, td_t td, char *param, int len, tor_flags_t tflags, long evtid); 
+extern int next_stage_twritep(spdid_t spdid, td_t td, int cbid, int sz);
 
 td_t 
 tsplit(spdid_t spdid, td_t td, char *param,
@@ -64,7 +63,11 @@ tread(spdid_t spdid, td_t td, int cbid, int sz)
 int
 treadp(spdid_t spdid, td_t td, int *off, int *len)
 {
-       return -ENOSYS;
+       *off = 0;
+       *len = cbuf_mat_tmp->size;
+       cbufp_send_deref(cbuf_mat_tmp->cbid);
+
+       return cbuf_mat_tmp->cbid;
 }
 
 int 
@@ -82,7 +85,9 @@ twritep(spdid_t spdid, td_t td, int cbid, int sz)
         char *buf;
         ccv_bbf_classifier_cascade_t* cascade;
         struct torrent *t;
+        long evtid;
         ccv_dense_matrix_t *ccv_mat_input;
+        td_t next_stage_td;
 
         if (tor_isnull(td)) return -EINVAL;
 
@@ -107,8 +112,13 @@ twritep(spdid_t spdid, td_t td, int cbid, int sz)
         }
         ccv_array_free(seq);
 
-        /*cbuf_matrix_t *cbuf_mat = ccv2cbufmat(ccv_mat_output);*/
-        /*cbufp_send_deref(cbuf_mat->cbid);*/
+        cbuf_mat_tmp = ccv2cbufmat(ccv_mat_input); /* no output matrix */ 
+        cbufp_send_deref(cbuf_mat_tmp->cbid);
+
+        /* send to next stage */
+        evtid = evt_split(cos_spd_id(), 0, 0);
+        next_stage_td = next_stage_tsplit(cos_spd_id(), td_root, "", strlen(""), TOR_ALL, evtid);
+        next_stage_twritep(cos_spd_id(), next_stage_td, cbuf_mat_tmp->cbid, cbuf_mat_tmp->size);
 
         return ret; /*TODO: ret value */ 
 }

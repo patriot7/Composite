@@ -1,6 +1,6 @@
-C_OBJS=ccv_edgedetect.o
+C_OBJS=ccv_exporter.o
 ASM_OBJS=
-COMPONENT=ccv_ed.o
+COMPONENT=ccv_exit.o
 INTERFACES=torrent
 DEPENDENCIES=printc cbufp cbuf_c evt lock mem_mgr_large valloc
 IF_LIB=./cos_libccv.a $(DIETDIR)/bin-i386/libm.a

@@ -17,10 +17,7 @@
 #include <stdlib.h>
 #include "../../../lib/libccv/cbuf_ccv.h"
 
-cbuf_matrix_t *treadp_buf;
-
-extern td_t next_stage_tsplit(spdid_t spdid, td_t td, char *param, int len, tor_flags_t tflags, long evtid);
-extern int next_stage_twritep(spdid_t spdid, td_t td, int cbid, int sz);
+cbuf_matrix_t *cbuf_mat_export;
 
 td_t 
 tsplit(spdid_t spdid, td_t td, char *param,
@@ -44,18 +41,21 @@ done:
 int 
 tmerge(spdid_t spdid, td_t td, td_t td_into, char *param, int len)
 {
-       return -EINVAL;
+        assert(0);
+        return -EINVAL;
 }
 
 void
 trelease(spdid_t spdid, td_t td)
 {
+        assert(0);
 	return;
 }
 
 int 
 tread(spdid_t spdid, td_t td, int cbid, int sz)
 {
+        assert(0);
         return -ENOSYS;
 }
 
@@ -63,15 +63,16 @@ int
 treadp(spdid_t spdid, td_t td, int *off, int *len)
 {
        *off = 0;
-       *len = treadp_buf->size;
-       cbufp_send_deref(treadp_buf->cbid);
+       *len = cbuf_mat_export->size;
+       cbufp_send_deref(cbuf_mat_export->cbid);
 
-       return treadp_buf->cbid;
+       return cbuf_mat_export->cbid;
 }
 
 int 
 twrite(spdid_t spdid, td_t td, int cbid, int sz)
 {
+       assert(0);
        return -ENOSYS;
 }
 
@@ -80,35 +81,21 @@ twritep(spdid_t spdid, td_t td, int cbid, int sz)
 {
        int ret = -1;
 
-       cbufp_t cb;
        char *buf;
-       int ratio;
        struct torrent *t;
-       ccv_dense_matrix_t *ccv_mat_input = NULL;
-       ccv_dense_matrix_t *ccv_mat_output = NULL;
+       cbuf_matrix_t *cbuf_mat;
 
        if (tor_isnull(td)) return -EINVAL;
 
        t = tor_lookup(td);
        assert(t);
 
-       ratio = (int)t->data;
-
        buf = cbufp2buf(cbid, sz);
        assert(buf);
-       ccv_mat_input = cbuf2ccvmat((cbuf_matrix_t *)buf);
-       ccv_resample(ccv_mat_input, &ccv_mat_output, 0, ccv_mat_input->rows / ratio, ccv_mat_input->cols / ratio, CCV_INTER_AREA);
-       treadp_buf = ccv2cbufmat(ccv_mat_output); /* write to the global temp buf for test */ 
+       cbuf_mat_export = (cbuf_matrix_t *)buf;
 
-       /* send the matrix to next stage */ 
-       long evtid = evt_split(cos_spd_id(), 0, 0);
-       td_t next_td = next_stage_tsplit(cos_spd_id(), td_root, "face", strlen("face"), TOR_ALL, evtid); /* even though we could use arbitry "next_stage" torrent, we still to use particular parameter here */ 
-       cbufp_send_deref(treadp_buf->cbid);
-       next_stage_twritep(cos_spd_id(), next_td, treadp_buf->cbid, treadp_buf->size);
-
-       return ret; /*TODO: ret value */ 
+       return ret; /*TODO: ret value */
 }
-
 
 int 
 cos_init(void)

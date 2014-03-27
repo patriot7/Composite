@@ -19,6 +19,9 @@
 
 cbuf_matrix_t *cbuf_mat_tmp;
 
+extern td_t next_stage_tsplit(spdid_t spdid, td_t td, char *param, int len, tor_flags_t tflags, long evtid); 
+extern int next_stage_twritep(spdid_t spdid, td_t td, int cbid, int sz);
+
 td_t 
 tsplit(spdid_t spdid, td_t td, char *param,
        int len, tor_flags_t tflags, long evtid) 
@@ -29,7 +32,7 @@ tsplit(spdid_t spdid, td_t td, char *param,
        if (td != td_root) return -EINVAL;
 
        nt = tor_alloc(NULL, tflags);
-       nt->data = atoi(param);
+       nt->data = (void *)atoi(param);
        if (!nt) ERR_THROW(-ENOMEM, done);
        ret = nt->td;
 
@@ -79,8 +82,9 @@ twritep(spdid_t spdid, td_t td, int cbid, int sz)
 
        cbufp_t cb;
        char *buf;
-       int ratio;
        struct torrent *t;
+       long evtid;
+       td_t next_stage_td;
        ccv_dense_matrix_t *ccv_mat_input = NULL;
        ccv_dense_matrix_t *ccv_mat_output = NULL;
 
@@ -89,26 +93,27 @@ twritep(spdid_t spdid, td_t td, int cbid, int sz)
        t = tor_lookup(td);
        assert(t);
 
-       ratio = (int)t->data;
+       int filter_size = (int)t->data;
+       int low_thresh = 36;   /* TODO: two thresh hold should from td->data*/ 
+       int high_thresh = 36 * 3;
 
        buf = cbufp2buf(cbid, sz);
        assert(buf);
 
        ccv_mat_input = cbuf2ccvmat((cbuf_matrix_t *)buf);
+       ccv_canny(ccv_mat_input, &ccv_mat_output, 0, filter_size, low_thresh, high_thresh);
 
-       ccv_resample(ccv_mat_input, &ccv_mat_output, 0, ccv_mat_input->rows / ratio, ccv_mat_input->cols / ratio, CCV_INTER_AREA);
-
+       /* send for treadp */
        cbuf_mat_tmp = ccv2cbufmat(ccv_mat_output);
+       cbufp_send(cbuf_mat_tmp->cbid);
 
-       /* send the matrix to facedetect torrent */ 
-       long evtid = evt_split(cos_spd_id(), 0, 0);
-       /*next_stage_tsplit(cos_spd_id(), td_root, "", strlen(""), TOR_ALL, evtid);*/
-       /*cbufp_send_deref(cbuf_mat->cbid);*/
-       /*ccv_fd_twritep(cos_spd_id(), td, cbuf_mat->cbid, cbuf_mat->size);*/
+       /* send to next stage */
+       evtid = evt_split(cos_spd_id(), 0, 0);
+       next_stage_td = next_stage_tsplit(cos_spd_id(), td_root, "", strlen(""), TOR_ALL, evtid);
+       next_stage_twritep(cos_spd_id(), next_stage_td, cbuf_mat_tmp->cbid, cbuf_mat_tmp->size);
 
-       return ret; /*TODO: ret value */ 
+       return ret; /*TODO: ret value */
 }
-
 
 int 
 cos_init(void)

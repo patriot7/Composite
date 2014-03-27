@@ -132,7 +132,7 @@ void *valloc_alloc(spdid_t spdid, spdid_t dest, unsigned long npages)
                         off = bitmap_extent_find_set(&occ->pgd_occupied[0], 0, npages, MAP_MAX);
                         if (off < 0) continue;
                         ret = (void *)((char *)trac->extents[i].start + off * PAGE_SIZE);
-			printc("found available space, use spd_location %d\n", i);
+			printc("found available space in extents[%d]\n", i);
                         goto done;
                 }
 
@@ -145,7 +145,7 @@ void *valloc_alloc(spdid_t spdid, spdid_t dest, unsigned long npages)
                 bitmap_set_contig(&occ->pgd_occupied[0], 0, ext_size, 1);
                 bitmap_set_contig(&occ->pgd_occupied[0], 0, npages, 0);
                 ret = trac->extents[i].start;
-		printc("not found available space in previous extent, use extents[%d]\n", i);
+		printc("not found available space in previous extents, create and use extents[%d]\n", i);
                 break;
         }
 

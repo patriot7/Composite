@@ -22,10 +22,13 @@ cos_init(void)
         td_t td;
 
         /*int i;*/
-        /*void *test[100];*/
-        /*for (i = 0; i < 100; i++)*/
-                /*test[i] = malloc(1024*1024);*/
-        /*for (i = 0; i < 100; i++)*/
+        /*void *test[64];*/
+        /*for (i = 0; i < 64; i++){*/
+                /*printc("alloc/write %d\n", i);*/
+                /*test[i] = malloc(1024 * 1024);*/
+                /**(int *)test[i] = i;*/
+/*}*/
+        /*for (i = 0; i < 64; i++)*/
                 /*free(test[i]);*/
 
         evt_tsplit = evt_split(cos_spd_id(), 0, 0);
