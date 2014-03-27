@@ -12,8 +12,8 @@ extern int do_munmap(void*, size_t);
 extern td_t fs_tsplit(spdid_t spdid, td_t td, char *param, int len, tor_flags_t tflags, long evtid);
 extern int fs_trmeta(spdid_t spdid, td_t td, const char *key, unsigned int klen, char *retval, unsigned int max_rval_len);
 extern int fs_twmeta(spdid_t spdid, td_t td, const char *key, unsigned int klen, const char *val, unsigned int vlen);
-extern int tread(spdid_t spdid, td_t td, int cbid, int sz);
-extern int twrite(spdid_t spdid, td_t td, int cbid, int sz);
+extern int fs_tread(spdid_t spdid, td_t td, int cbid, int sz);
+extern int fs_twrite(spdid_t spdid, td_t td, int cbid, int sz);
 
 typedef long (*cos_syscall_t)(long a, long b, long c, long d, long e, long f);
 cos_syscall_t cos_syscalls[SYSCALLS_NUM];

@@ -5,15 +5,12 @@
 #define __thread
 
 #define CBUF_ENABLE
-
 #ifdef CBUF_ENABLE
 #include "cbuf_ccv.h"
-
 #define ccmalloc cbuf_ccv_alloc 
 #define ccfree cbuf_ccv_free
 /*cbufp_ccv_alloc_creator(ccmalloc);*/
 /*cbufp_ccv_free_creator(ccfree);*/
-
 #endif
 
 static __thread ccv_cache_t ccv_cache;

@@ -131,7 +131,6 @@ REGPARM(1) void *do_mmap(size_t size) {
 #if ALLOC_DEBUG >= ALLOC_DEBUG_ALL
 	if (alloc_debug) printc("malloc in %d: mmapped region into %x", cos_spd_id(), ret);
 #endif
-	printc("hp = %p\n", hp);
 	return hp;
 }
 

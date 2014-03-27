@@ -2,11 +2,11 @@
 #include <stdio.h>
 #include <print.h>
 #include "../../../lib/libccv/ccv.h"
-#include <print.h>
 
 #define CCV_CACHE_STAT
 #define X_SLICE 1
 #define Y_SLICE 1
+#define lround round
 
 void cos_ccv_merge(ccv_dense_matrix_t* mat[], ccv_dense_matrix_t** output, int rows, int cols, int x, int y);
 
@@ -62,6 +62,7 @@ cos_ccv_merge(ccv_dense_matrix_t* mat[], ccv_dense_matrix_t** output, int rows, 
 	unsigned int slice_step= mat[0]->step;
 	unsigned int slice_num = x * y;
 	unsigned int pixel_num = slice_rows * slice_step; 
+
 	for (i = 0; i < slice_num; i++) {
 		unsigned int x_offset = i % x;
 		unsigned int y_offset = i / x;
@@ -72,6 +73,7 @@ cos_ccv_merge(ccv_dense_matrix_t* mat[], ccv_dense_matrix_t** output, int rows, 
 			merged->data.u8[(y_offset * slice_rows + mrow) * merged->step + x_offset * slice_step + mcol] = mat[i]->data.u8[mrow * slice_step + mcol];
 		}
 	}
+
 	*output = merged;
 	ccv_disable_cache();
 

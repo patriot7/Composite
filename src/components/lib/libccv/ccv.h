@@ -20,6 +20,8 @@
 #include <assert.h>
 #include <alloca.h>
 
+#include "ccv_math.h"
+
 #define CCV_PI (3.141592653589793)
 #define ccmalloc malloc
 #define cccalloc calloc

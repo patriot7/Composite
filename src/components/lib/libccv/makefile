@@ -1,6 +1,6 @@
 CC :=../dietlibc-0.29/bin-i386/diet gcc 
 AR :=ar
-CFLAGS :=-Wall -fno-stack-protector -nostdinc -nostdlib -Os -ffast-math
+CFLAGS :=-Wall -fno-stack-protector -Os -ffast-math -notstdinc -nostdlib
 COS_INC :=-I../../include -I../../../kernel/include/shared -I../../interface/cbuf_c -I../../interface/evt -I../../interface/cbufp
 
 .PHONY: all clean
@@ -16,5 +16,5 @@ ccv_io.o: ccv_io.c ccv.h ccv_internal.h io/*.c
 %.o: %.c ccv.h ccv_internal.h cbuf_ccv.h
 	$(CC) $(COS_INC) $< -o $@ -c $(CFLAGS)
 
-cos_libccv.a:ccv_basic.o ccv_classic.o ccv_bbf.o ccv_util.o ccv_memory.o ccv_cache.o ccv_resample.o ccv_io.o ccv_math.o 3rdparty/sha1/sha1.o cbuf_ccv.o
+cos_libccv.a:ccv_basic.o ccv_classic.o ccv_bbf.o ccv_util.o ccv_memory.o ccv_cache.o ccv_resample.o ccv_io.o 3rdparty/sha1/sha1.o cbuf_ccv.o ccv_math.o
 	$(AR) rcs $@ $^

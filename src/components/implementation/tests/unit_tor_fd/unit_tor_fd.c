@@ -9,6 +9,7 @@
 #include "../../../lib/libccv/cbuf_ccv.h"
 
 extern td_t ccv_fd_tsplit(spdid_t spdid, td_t td, char *param, int len, tor_flags_t tflags, long evtid);
+extern int ccv_fd_twritep(spdid_t spdid, td_t td, int cbid, int sz);
 
 void
 cos_init(void)

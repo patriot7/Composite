@@ -1,11 +1,10 @@
-C_OBJS=canny.o
+C_OBJS=edge_detect.o
 ASM_OBJS=
-COMPONENT=edge_detect.o
+COMPONENT=ed.o
 INTERFACES=
 DEPENDENCIES=sched printc timed_blk torrent cbufp cbuf_c evt mem_mgr_large valloc lock
 IF_LIB=./cos_libccv.a $(DIETDIR)/bin-i386/libm.a
 OBJLIBS += $(POSIX_LIB)
-
 FN_PREPEND=fs_
 
 pre: first all
