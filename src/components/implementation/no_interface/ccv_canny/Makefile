@@ -1,6 +1,6 @@
-C_OBJS=edge_detect.o
+C_OBJS=ccv_canny.o
 ASM_OBJS=
-COMPONENT=ed.o
+COMPONENT=ccv_edge_detect.o
 INTERFACES=
 DEPENDENCIES=sched printc timed_blk torrent cbufp cbuf_c evt mem_mgr_large valloc lock
 IF_LIB=./cos_libccv.a $(DIETDIR)/bin-i386/libm.a

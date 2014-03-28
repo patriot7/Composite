@@ -1,6 +1,6 @@
 CC :=../dietlibc-0.29/bin-i386/diet gcc 
 AR :=ar
-CFLAGS :=-Wall -fno-stack-protector -Os -ffast-math -notstdinc -nostdlib
+CFLAGS :=-Wall -fno-stack-protector -Os -ffast-math -nostdinc -nostdlib
 COS_INC :=-I../../include -I../../../kernel/include/shared -I../../interface/cbuf_c -I../../interface/evt -I../../interface/cbufp
 
 .PHONY: all clean

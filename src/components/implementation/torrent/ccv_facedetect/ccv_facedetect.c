@@ -65,7 +65,8 @@ treadp(spdid_t spdid, td_t td, int *off, int *len)
 {
        *off = 0;
        *len = cbuf_mat_tmp->size;
-       cbufp_send_deref(cbuf_mat_tmp->cbid);
+       /*cbufp_send_deref(cbuf_mat_tmp->cbid);*/
+       cbufp_send(cbuf_mat_tmp->cbid);
 
        return cbuf_mat_tmp->cbid;
 }
@@ -113,7 +114,8 @@ twritep(spdid_t spdid, td_t td, int cbid, int sz)
         ccv_array_free(seq);
 
         cbuf_mat_tmp = ccv2cbufmat(ccv_mat_input); /* no output matrix */ 
-        cbufp_send_deref(cbuf_mat_tmp->cbid);
+        /*cbufp_send_deref(cbuf_mat_tmp->cbid);*/
+        cbufp_send(cbuf_mat_tmp->cbid);
 
         /* send to next stage */
         evtid = evt_split(cos_spd_id(), 0, 0);

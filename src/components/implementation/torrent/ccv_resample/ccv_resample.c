@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include "../../../lib/libccv/cbuf_ccv.h"
 
-cbuf_matrix_t *treadp_buf;
+cbuf_matrix_t *cbuf_mat_tmp;
 
 extern td_t next_stage_tsplit(spdid_t spdid, td_t td, char *param, int len, tor_flags_t tflags, long evtid);
 extern int next_stage_twritep(spdid_t spdid, td_t td, int cbid, int sz);
@@ -32,7 +32,7 @@ tsplit(spdid_t spdid, td_t td, char *param,
        if (td != td_root) return -EINVAL;
 
        nt = tor_alloc(NULL, tflags);
-       nt->data = atoi(param);
+       nt->data = (void *)atoi(param);
        if (!nt) ERR_THROW(-ENOMEM, done);
        ret = nt->td;
 
@@ -63,10 +63,11 @@ int
 treadp(spdid_t spdid, td_t td, int *off, int *len)
 {
        *off = 0;
-       *len = treadp_buf->size;
-       cbufp_send_deref(treadp_buf->cbid);
+       *len = cbuf_mat_tmp->size;
+       /*cbufp_send_deref(cbuf_mat_tmp->cbid);*/
+       cbufp_send(cbuf_mat_tmp->cbid);
 
-       return treadp_buf->cbid;
+       return cbuf_mat_tmp->cbid;
 }
 
 int 
@@ -98,13 +99,16 @@ twritep(spdid_t spdid, td_t td, int cbid, int sz)
        assert(buf);
        ccv_mat_input = cbuf2ccvmat((cbuf_matrix_t *)buf);
        ccv_resample(ccv_mat_input, &ccv_mat_output, 0, ccv_mat_input->rows / ratio, ccv_mat_input->cols / ratio, CCV_INTER_AREA);
-       treadp_buf = ccv2cbufmat(ccv_mat_output); /* write to the global temp buf for test */ 
+       cbuf_mat_tmp = ccv2cbufmat(ccv_mat_output); /* write to the global temp buf for test */ 
 
        /* send the matrix to next stage */ 
        long evtid = evt_split(cos_spd_id(), 0, 0);
        td_t next_td = next_stage_tsplit(cos_spd_id(), td_root, "face", strlen("face"), TOR_ALL, evtid); /* even though we could use arbitry "next_stage" torrent, we still to use particular parameter here */ 
-       cbufp_send_deref(treadp_buf->cbid);
-       next_stage_twritep(cos_spd_id(), next_td, treadp_buf->cbid, treadp_buf->size);
+
+       /* as we also ref the cbuf using the global cbuf_mat_tmp for test, we don't use cbufp_send_deref here */
+       /*cbufp_send_deref(cbuf_mat_tmp->cbid);*/ 
+       cbufp_send(cbuf_mat_tmp->cbid);
+       next_stage_twritep(cos_spd_id(), next_td, cbuf_mat_tmp->cbid, cbuf_mat_tmp->size);
 
        return ret; /*TODO: ret value */ 
 }

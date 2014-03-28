@@ -1,5 +1,6 @@
 #include <limits.h>
 #include <assert.h>
+#include "ccv_math.h"
 
 /*
 

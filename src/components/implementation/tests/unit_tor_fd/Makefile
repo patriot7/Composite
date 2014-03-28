@@ -6,7 +6,7 @@ DEPENDENCIES=sched printc timed_blk torrent cbufp cbuf_c evt mem_mgr_large vallo
 IF_LIB=./cos_libccv.a $(DIETDIR)/bin-i386/libm.a
 OBJLIBS+=$(POSIX_LIB)
 
-FN_PREPEND=fs_ ccv_fd_
+FN_PREPEND=fs_ ccv_fd_ next_stage_
 
 pre: first all
 first:

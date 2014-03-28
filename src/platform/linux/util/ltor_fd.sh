@@ -3,7 +3,7 @@
 ./cos_loader \
 "c0.o, ;llboot.o, ;*fprr.o, ;mm.o, ;print.o, ;boot.o, ;\
 \
-!initfs.o,a3;!mpool.o,a3;!trans.o,a6;!sm.o,a4;!l.o,a1;!te.o,a3;!eg.o,a4;!buf.o,a5;!bufp.o, ;!tor_fd.o, ;!va.o,a2;!vm.o,a1;!ccv_fd.o, ;!rotar.o, :\
+!initfs.o,a3;!mpool.o,a3;!trans.o,a6;!sm.o,a4;!l.o,a1;!te.o,a3;!eg.o,a4;!buf.o,a5;!bufp.o, ;!tor_fd.o, ;!va.o,a2;!vm.o,a1;!ccv_fd.o, ;!rotar.o, ;!ccv_exit.o, :\
 c0.o-llboot.o;\
 fprr.o-print.o|[parent_]mm.o|[faulthndlr_]llboot.o;\
 l.o-fprr.o|mm.o|print.o;\
@@ -19,7 +19,8 @@ mpool.o-print.o|fprr.o|mm.o|boot.o|va.o|l.o;\
 vm.o-fprr.o|print.o|mm.o|l.o|boot.o;\
 va.o-fprr.o|print.o|mm.o|l.o|boot.o|vm.o;\
 rotar.o-sm.o|fprr.o|print.o|mm.o|buf.o|bufp.o|l.o|eg.o|va.o|initfs.o;\
-ccv_fd.o-sm.o|fprr.o|print.o|mm.o|buf.o|bufp.o|l.o|eg.o|va.o|initfs.o|[fs_]rotar.o;\
-tor_fd.o-sm.o|fprr.o|print.o|mm.o|buf.o|bufp.o|l.o|eg.o|va.o|initfs.o|[fs_]rotar.o|[ccv_fd_]ccv_fd.o;\
+ccv_exit.o-sm.o|fprr.o|print.o|mm.o|buf.o|bufp.o|l.o|eg.o|va.o|initfs.o|[fs_]rotar.o;\
+ccv_fd.o-sm.o|fprr.o|print.o|mm.o|buf.o|bufp.o|l.o|eg.o|va.o|initfs.o|[fs_]rotar.o|[next_stage_]ccv_exit.o;\
+tor_fd.o-sm.o|fprr.o|print.o|mm.o|buf.o|bufp.o|l.o|eg.o|va.o|initfs.o|[fs_]rotar.o|[ccv_fd_]ccv_fd.o|[next_stage_]ccv_exit.o;\
 trans.o-sm.o|fprr.o|l.o|buf.o|bufp.o|mm.o|va.o|eg.o|print.o\
 " ./gen_client_stub

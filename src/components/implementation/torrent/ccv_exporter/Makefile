@@ -4,8 +4,8 @@ COMPONENT=ccv_exit.o
 INTERFACES=torrent
 DEPENDENCIES=printc cbufp cbuf_c evt lock mem_mgr_large valloc torrent
 IF_LIB=./cos_libccv.a $(DIETDIR)/bin-i386/libm.a
-OBJLIBS += $(POSIX_LIB)
-FN_PREPEND=fs_ next_stage_
+#OBJLIBS += $(POSIX_LIB)
+FN_PREPEND=
 
 pre: first all
 first:

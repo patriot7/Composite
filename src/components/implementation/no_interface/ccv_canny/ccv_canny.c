@@ -3,10 +3,8 @@
 #include <print.h>
 #include "../../../lib/libccv/ccv.h"
 
-#define CCV_CACHE_STAT
 #define X_SLICE 1
 #define Y_SLICE 1
-#define lround round
 
 void cos_ccv_merge(ccv_dense_matrix_t* mat[], ccv_dense_matrix_t** output, int rows, int cols, int x, int y);
 

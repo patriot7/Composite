@@ -29,7 +29,7 @@ tsplit(spdid_t spdid, td_t td, char *param,
        if (td != td_root) return -EINVAL;
 
        nt = tor_alloc(NULL, tflags);
-       nt->data = atoi(param);
+       nt->data = (void *)atoi(param);
        if (!nt) ERR_THROW(-ENOMEM, done);
        ret = nt->td;
 

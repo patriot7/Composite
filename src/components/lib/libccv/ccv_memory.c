@@ -5,13 +5,13 @@
 #define __thread
 
 #define CBUF_ENABLE
-#ifdef CBUF_ENABLE
+/*#ifdef CBUF_ENABLE*/
 #include "cbuf_ccv.h"
 #define ccmalloc cbuf_ccv_alloc 
 #define ccfree cbuf_ccv_free
 /*cbufp_ccv_alloc_creator(ccmalloc);*/
 /*cbufp_ccv_free_creator(ccfree);*/
-#endif
+/*#endif*/
 
 static __thread ccv_cache_t ccv_cache;
 
@@ -75,20 +75,20 @@ ccv_dense_matrix_t* ccv_dense_matrix_new(int rows, int cols, int type, void* dat
 
 ccv_dense_matrix_t* ccv_dense_matrix_renew(ccv_dense_matrix_t* x, int rows, int cols, int types, int prefer_type, uint64_t sig)
 {
-	/*if (x != 0)*/
-	/*{*/
-		/*assert(0);*/
-		/*assert(x->rows == rows && x->cols == cols && (CCV_GET_DATA_TYPE(x->type) & types) && (CCV_GET_CHANNEL(x->type) == CCV_GET_CHANNEL(types)));*/
-		/*prefer_type = CCV_GET_DATA_TYPE(x->type) | CCV_GET_CHANNEL(x->type);*/
-	/*}*/
-	/*if (sig != 0)*/
-		/*sig = ccv_cache_generate_signature((const char*)&prefer_type, sizeof(int), sig, CCV_EOF_SIGN);*/
-	/*if (x == 0)*/
-	/*{*/
+	if (x != 0)
+	{
+		assert(0);
+		assert(x->rows == rows && x->cols == cols && (CCV_GET_DATA_TYPE(x->type) & types) && (CCV_GET_CHANNEL(x->type) == CCV_GET_CHANNEL(types)));
+		prefer_type = CCV_GET_DATA_TYPE(x->type) | CCV_GET_CHANNEL(x->type);
+	}
+	if (sig != 0)
+		sig = ccv_cache_generate_signature((const char*)&prefer_type, sizeof(int), sig, CCV_EOF_SIGN);
+	if (x == 0)
+	{
 		x = ccv_dense_matrix_new(rows, cols, prefer_type, 0, sig);
-	/*} else {*/
-		/*x->sig = sig;*/
-	/*}*/
+	} else {
+		x->sig = sig;
+	}
 	return x;
 }
 
