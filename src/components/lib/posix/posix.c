@@ -25,6 +25,7 @@ fs_tread_pack(spdid_t spdid, td_t td, char *data, int len)
 	char *d;
 	int ret;
 
+        printc("call this fucking cbuf\n");
 	d = cbuf_alloc(len, &cb);
 	if (!d) return -1;
 

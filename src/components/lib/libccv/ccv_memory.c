@@ -26,9 +26,11 @@ static __thread int ccv_cache_opt = 0;
 
 ccv_dense_matrix_t* ccv_dense_matrix_new(int rows, int cols, int type, void* data, uint64_t sig)
 {
+	printc("ccv_dense_matrix_new()\n");
 	ccv_dense_matrix_t* mat;
 	if (ccv_cache_opt && sig != 0 && !data && !(type & CCV_NO_DATA_ALLOC))
 	{
+		printc("no1\n");
 #ifdef CBUF_ENABLE
 		assert(0); /* ccv_cache not supported */ 
 #endif
@@ -44,6 +46,7 @@ ccv_dense_matrix_t* ccv_dense_matrix_new(int rows, int cols, int type, void* dat
 	}
 	if (type & CCV_NO_DATA_ALLOC)
 	{
+		printc("no2\n");
 #ifdef CBUF_ENABLE
 		assert(0); /* CCV_NO_DATA_ALLOC not supported */ 
 #endif
@@ -55,6 +58,7 @@ ccv_dense_matrix_t* ccv_dense_matrix_new(int rows, int cols, int type, void* dat
 		assert(data == NULL);  /* no user-managed matrix data */ 
 #endif
 		mat = (ccv_dense_matrix_t*)(data ? data : ccmalloc(ccv_compute_dense_matrix_size(rows, cols, type)));
+		printc("ccv_dense_matrix_new alloc done\n");
 		mat->type = (CCV_GET_CHANNEL(type) | CCV_GET_DATA_TYPE(type) | CCV_MATRIX_DENSE) & ~CCV_GARBAGE;
 		mat->type |= data ? CCV_UNMANAGED : CCV_REUSABLE; // it still could be reusable because the signature could be derived one.
 #ifndef CBUF_ENABLE
@@ -75,20 +79,20 @@ ccv_dense_matrix_t* ccv_dense_matrix_new(int rows, int cols, int type, void* dat
 
 ccv_dense_matrix_t* ccv_dense_matrix_renew(ccv_dense_matrix_t* x, int rows, int cols, int types, int prefer_type, uint64_t sig)
 {
-	if (x != 0)
-	{
-		assert(0);
-		assert(x->rows == rows && x->cols == cols && (CCV_GET_DATA_TYPE(x->type) & types) && (CCV_GET_CHANNEL(x->type) == CCV_GET_CHANNEL(types)));
-		prefer_type = CCV_GET_DATA_TYPE(x->type) | CCV_GET_CHANNEL(x->type);
-	}
-	if (sig != 0)
-		sig = ccv_cache_generate_signature((const char*)&prefer_type, sizeof(int), sig, CCV_EOF_SIGN);
-	if (x == 0)
-	{
+	/*if (x != 0)*/
+	/*{*/
+		/*assert(0);*/
+		/*assert(x->rows == rows && x->cols == cols && (CCV_GET_DATA_TYPE(x->type) & types) && (CCV_GET_CHANNEL(x->type) == CCV_GET_CHANNEL(types)));*/
+		/*prefer_type = CCV_GET_DATA_TYPE(x->type) | CCV_GET_CHANNEL(x->type);*/
+	/*}*/
+	/*if (sig != 0)*/
+		/*sig = ccv_cache_generate_signature((const char*)&prefer_type, sizeof(int), sig, CCV_EOF_SIGN);*/
+	/*if (x == 0)*/
+	/*{*/
 		x = ccv_dense_matrix_new(rows, cols, prefer_type, 0, sig);
-	} else {
-		x->sig = sig;
-	}
+	/*} else {*/
+		/*x->sig = sig;*/
+	/*}*/
 	return x;
 }
 

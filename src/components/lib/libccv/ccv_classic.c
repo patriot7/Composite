@@ -200,12 +200,15 @@ void ccv_canny(ccv_dense_matrix_t* a, ccv_dense_matrix_t** b, int type, int size
 	type = (type == 0) ? CCV_8U | CCV_C1 : CCV_GET_DATA_TYPE(type) | CCV_C1;
 	ccv_dense_matrix_t* db = *b = ccv_dense_matrix_renew(*b, a->rows, a->cols, CCV_C1 | CCV_ALL_DATA_TYPE, type, sig);
 	ccv_object_return_if_cached(, db);
+	printc("begin process\n");
 	if ((a->type & CCV_8U) || (a->type & CCV_32S))
 	{
 		ccv_dense_matrix_t* dx = 0;
 		ccv_dense_matrix_t* dy = 0;
+		printc("begin ccv_sobel\n");
 		ccv_sobel(a, &dx, 0, size, 0);
 		ccv_sobel(a, &dy, 0, 0, size);
+		printc("done ccv_sobel\n");
 		/* special case, all integer */
 		int low = (int)(low_thresh + 0.5);
 		int high = (int)(high_thresh + 0.5);
@@ -222,11 +225,13 @@ void ccv_canny(ccv_dense_matrix_t* a, ccv_dense_matrix_t** b, int type, int size
 			rows[1][j] = abs(dxi[j]) + abs(dyi[j]);
 		dxi += a->cols;
 		dyi += a->cols;
-		int* map = (int*)ccmalloc(sizeof(int) * (a->rows + 2) * (a->cols + 2));
+		/*int* map = (int*)ccmalloc(sizeof(int) * (a->rows + 2) * (a->cols + 2));*/
+		int* map = (int*)malloc(sizeof(int) * (a->rows + 2) * (a->cols + 2));
 		memset(map, 0, sizeof(int) * (a->cols + 2));
 		int* map_ptr = map + a->cols + 2 + 1;
 		int map_cols = a->cols + 2;
-		int** stack = (int**)ccmalloc(sizeof(int*) * a->rows * a->cols);
+		/*int** stack = (int**)ccmalloc(sizeof(int*) * a->rows * a->cols);*/
+		int** stack = (int**)malloc(sizeof(int*) * a->rows * a->cols);
 		int** stack_top = stack;
 		int** stack_bottom = stack;
 		for (i = 1; i <= a->rows; i++)
@@ -327,8 +332,10 @@ void ccv_canny(ccv_dense_matrix_t* a, ccv_dense_matrix_t** b, int type, int size
 		}
 		ccv_matrix_setter(db->type, for_block);
 #undef for_block
-		ccfree(stack);
-		ccfree(map);
+		/*ccfree(stack);*/
+		/*ccfree(map);*/
+		free(stack);
+		free(map);
 		ccv_matrix_free(dx);
 		ccv_matrix_free(dy);
 		free(mbuf);

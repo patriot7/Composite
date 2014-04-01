@@ -7,11 +7,15 @@ void ccv_sobel(ccv_dense_matrix_t* a, ccv_dense_matrix_t** b, int type, int dx, 
 {
 	ccv_declare_derived_signature(sig, a->sig != 0, ccv_sign_with_format(64, "ccv_sobel(%d,%d)", dx, dy), a->sig, CCV_EOF_SIGN);
 	type = (type == 0) ? CCV_32S | CCV_GET_CHANNEL(a->type) : CCV_GET_DATA_TYPE(type) | CCV_GET_CHANNEL(a->type);
+	printc("begin renew\n");
 	ccv_dense_matrix_t* db = *b = ccv_dense_matrix_renew(*b, a->rows, a->cols, CCV_GET_CHANNEL(a->type) | CCV_ALL_DATA_TYPE, type, sig);
+	printc("finished renew\n");
 	ccv_object_return_if_cached(, db);
+	printc("finished return cached\n");
 	int i, j, k, c, ch = CCV_GET_CHANNEL(a->type);
 	unsigned char* a_ptr = a->data.u8;
 	unsigned char* b_ptr = db->data.u8;
+	printc("begin the big macro\n");
 	if (dx == 1 || dy == 1)
 	{
 		/* special case 1: 1x3 or 3x1 window */
@@ -54,6 +58,7 @@ void ccv_sobel(ccv_dense_matrix_t* a, ccv_dense_matrix_t** b, int type, int dx, 
 #undef for_block
 		}
 	} else if (dx > 3 || dy > 3) {
+		printc("not go through the big macro\n");
 		/* general case: in this case, I will generate a separable filter, and do the convolution */
 		int fsz = ccv_max(dx, dy);
 		assert(fsz % 2 == 1);

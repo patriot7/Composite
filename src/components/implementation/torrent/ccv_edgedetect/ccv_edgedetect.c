@@ -101,7 +101,9 @@ twritep(spdid_t spdid, td_t td, int cbid, int sz)
        assert(buf);
 
        ccv_mat_input = cbuf2ccvmat((cbuf_matrix_t *)buf);
+       printc("begin ccv_canny\n");
        ccv_canny(ccv_mat_input, &ccv_mat_output, 0, filter_size, low_thresh, high_thresh);
+       printc("ccv_canny done\n");
 
        /* send for treadp */
        cbuf_mat_tmp = ccv2cbufmat(ccv_mat_output);
