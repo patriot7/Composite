@@ -62,23 +62,23 @@ struct spd_vas_tracker {
 
 static int __valloc_init(spdid_t spdid)
 {
-	int ret = -1;
-	struct spd_vas_tracker *trac;
-	struct spd_vas_occupied *occ;
-	struct cos_component_information *ci;
-	unsigned long page_off;
-	void *hp;
+        int ret = -1;
+        struct spd_vas_tracker *trac;
+        struct spd_vas_occupied *occ;
+        struct cos_component_information *ci;
+        unsigned long page_off;
+        void *hp;
 
-	if (cos_vect_lookup(&spd_vect, spdid)) goto success;
-	trac = malloc(sizeof(struct spd_vas_tracker));
-	if (!trac) goto done;
+        if (cos_vect_lookup(&spd_vect, spdid)) goto success;
+        trac = malloc(sizeof(struct spd_vas_tracker));
+        if (!trac) goto done;
 
-	occ = alloc_page();
-	if (!occ) goto err_free1;
-	
-	ci = cos_get_vas_page();
-	if (cinfo_map(cos_spd_id(), (vaddr_t)ci, spdid)) goto err_free2;
-	hp = (void*)ci->cos_heap_ptr;
+        occ = alloc_page();
+        if (!occ) goto err_free1;
+
+        ci = cos_get_vas_page();
+        if (cinfo_map(cos_spd_id(), (vaddr_t)ci, spdid)) goto err_free2;
+        hp = (void*)ci->cos_heap_ptr;
 
         trac->spdid            = spdid;
         trac->ci               = ci;
@@ -89,10 +89,10 @@ static int __valloc_init(spdid_t spdid)
         page_off = ((unsigned long)hp - (unsigned long)round_to_pgd_page(hp))/PAGE_SIZE;
         bitmap_set_contig(&occ->pgd_occupied[0], page_off, (PGD_SIZE/PAGE_SIZE)-page_off, 1);
 
-	cos_vect_add_id(&spd_vect, trac, spdid);
-	assert(cos_vect_lookup(&spd_vect, spdid));
+        cos_vect_add_id(&spd_vect, trac, spdid);
+        assert(cos_vect_lookup(&spd_vect, spdid));
 success:
-	ret = 0;
+        ret = 0;
 done:
 	return ret;
 err_free2:
@@ -141,6 +141,7 @@ void *valloc_alloc(spdid_t spdid, spdid_t dest, unsigned long npages)
                 trac->extents[i].start = (void*)vas_mgr_expand(spdid, dest, ext_size * PAGE_SIZE);
                 trac->extents[i].end = (void *)(trac->extents[i].start + ext_size * PAGE_SIZE);
                 bitmap_set_contig(&occ->pgd_occupied[0], 0, ext_size, 1);
+                /*ret = bitmap_extent_find_set(&occ->pgd_occupied[0], 0, npages, MAP_MAX);*/
                 bitmap_set_contig(&occ->pgd_occupied[0], 0, npages, 0);
                 ret = trac->extents[i].start;
                 break;
