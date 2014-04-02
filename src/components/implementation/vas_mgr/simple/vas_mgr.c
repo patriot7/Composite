@@ -85,6 +85,8 @@ vas_mgr_expand(spdid_t spd, spdid_t dest, unsigned long amnt)
 		
 		if (cos_vas_cntl(COS_VAS_SPD_EXPAND, dest, s, amnt)) {
 			vas->s[s_idx] = &unknown;
+			i--;
+			a -= SERVICE_SIZE;
 			continue;
 		}
 
@@ -96,6 +98,7 @@ vas_mgr_expand(spdid_t spd, spdid_t dest, unsigned long amnt)
 	}
 done:
 	UNLOCK();
+	printc("vas expand %x\n", ret);
 	return ret;
 }
 

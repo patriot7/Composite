@@ -234,6 +234,7 @@ static inline void REGPARM(2) __small_free(void*_ptr,size_t _size) {
 	alloc_stats_report(DBG_FREE, idx);
 }
 
+int ryx = 0;
 static inline void* REGPARM(1) __small_malloc(size_t _size) {
 	__alloc_t *ptr, *next;
 	size_t size=_size;
@@ -251,6 +252,9 @@ static inline void* REGPARM(1) __small_malloc(size_t _size) {
 			__alloc_t *start, *second, *end;
 			
 			start = ptr = do_mmap(MEM_BLOCK_SIZE);
+			if (ptr == 0x4dc00000)
+				ryx = 1;
+
 			if (ptr==MAP_FAILED) return MAP_FAILED;
 
 			nr=__SMALL_NR(size)-1;
@@ -275,6 +279,9 @@ static inline void* REGPARM(1) __small_malloc(size_t _size) {
 #endif
 			return start;
 		} 
+		if (ryx == 1)
+			printc("malloc ptr %x next %x\n", ptr, ptr->next);
+
 		next = ptr->next;
 		//__small_mem[idx]=ptr->next;
 	} while (unlikely(cos_cmpxchg(&__small_mem[idx], (long)ptr, (long)next) != (long)next));

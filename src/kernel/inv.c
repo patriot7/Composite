@@ -301,7 +301,8 @@ fault_ipc_invoke(struct thread *thd, vaddr_t fault_addr, int flags, struct pt_re
 	unsigned int fault_cap;
 	struct pt_regs *nregs;
 
-	/* printk("thd %d, fault addr %p, flags %d, fault num %d\n", thd_get_id(thd), fault_addr, flags, fault_num); */
+	if (thd_get_id(thd) == 10)
+	printk("thd %d, fault addr %p, flags %d, fault num %d\n", thd_get_id(thd), fault_addr, flags, fault_num); 
 	/* corrupted ip? */
 	if (unlikely(!s)) {
 		curr_frame = thd_invstk_top(thd);
@@ -2808,6 +2809,16 @@ cos_syscall_mmap_cntl(int spdid, long op_flags_dspd, vaddr_t daddr, unsigned lon
 			ret = -1;
 			break;
 		}
+		if (daddr >= 0x4dc00000) {
+//			printk("pte addr %x\n", daddr);
+		if (chal_pgtbl_add(spd->composite_spd->pg_tbl, daddr, page, flags)) {
+			printk("cos: mmap grant into %d @ %x -- could not add entry to page table.\n", 
+			       dspd_id, (unsigned int)daddr);
+			ret = -1;
+			break;
+		}
+		}
+
 		cos_meas_event(COS_MAP_GRANT);
 		break;
 	case COS_MMAP_REVOKE:

@@ -30,7 +30,7 @@
 #ifdef ALLOC_DEBUG
 #define COS_FMT_PRINT
 #include <print.h>
-int alloc_debug = 0;
+int alloc_debug = 1;
 #endif
 #include <string.h>
 
@@ -225,11 +225,15 @@ static inline void REGPARM(2) __small_free(void*_ptr,size_t _size) {
 #endif
 	do {
 		prev = __small_mem[idx];
+		printc("into free ptr %x\n", ptr->next);
+//		massert(ptr->next != 0x4e);
 		ptr->next=prev;
+//		massert(ptr->next != 0x4e);
 	} while (unlikely(cos_cmpxchg(&__small_mem[idx], (int)prev, (int)ptr) != (int)ptr));
 	alloc_stats_report(DBG_FREE, idx);
 }
 
+int ryx = 0;
 static inline void* REGPARM(1) __small_malloc(size_t _size) {
 	__alloc_t *ptr, *next;
 	size_t size=_size;
@@ -238,6 +242,9 @@ static inline void* REGPARM(1) __small_malloc(size_t _size) {
 	idx=get_index(size);
 	do {
 		ptr=__small_mem[idx];
+//		if (ptr != 0)
+//		massert(ptr->next != 0x4e);
+		printc("into malloc ptr %x\n", ptr);
 #if ALLOC_DEBUG >= ALLOC_DEBUG_ALL
 		if (alloc_debug) printc("malloc (in %d): head of list for size %d (idx %d) is %x", 
 					cos_spd_id(), _size, idx, __small_mem[idx]);
@@ -247,6 +254,8 @@ static inline void* REGPARM(1) __small_malloc(size_t _size) {
 			__alloc_t *start, *second, *end;
 			
 			start = ptr = do_mmap(MEM_BLOCK_SIZE);
+			if (ptr == 0x4dc00000)
+				ryx = 1;
 			if (ptr==MAP_FAILED) return MAP_FAILED;
 
 			nr=__SMALL_NR(size)-1;
@@ -271,9 +280,13 @@ static inline void* REGPARM(1) __small_malloc(size_t _size) {
 #endif
 			return start;
 		} 
+//		if (ryx == 1)
+			printc("malloc ptr %x next %x ", ptr, ptr->next);
 		next = ptr->next;
+//		massert(ptr->next != 0x4e);
 		//__small_mem[idx]=ptr->next;
 	} while (unlikely(cos_cmpxchg(&__small_mem[idx], (long)ptr, (long)next) != (long)next));
+	printc("ret %x\n", ptr);
 	ptr->next=0;
 
 #if ALLOC_DEBUG >= ALLOC_DEBUG_ALL
@@ -281,7 +294,7 @@ static inline void* REGPARM(1) __small_malloc(size_t _size) {
 				cos_spd_id(), ptr, size, idx, __small_mem[idx]);
 #endif
 	/* 
-	 * FIXME: This still suffers from the ABA problem -- still a
+<	 * FIXME: This still suffers from the ABA problem -- still a
 	 * race if ptr and next are removed from list, then ptr put
 	 * back in between ptr=__small_mem[idx] and the cmpxchg.  next
 	 * is used elsewhere, but we are still going to put it back at
@@ -290,6 +303,7 @@ static inline void* REGPARM(1) __small_malloc(size_t _size) {
 	 */
 	alloc_stats_report(DBG_ALLOC, idx);
 
+	//printc("ret %x\n", ptr);
 	return ptr;
 }
 
@@ -315,29 +329,30 @@ static __alloc_t zeromem[2];
 #endif
 
 static void* _alloc_libc_malloc(size_t size) {
-  __alloc_t* ptr;
-  size_t need;
+	__alloc_t* ptr;
+	size_t need;
 #ifdef WANT_MALLOC_ZERO
-  if (!size) return BLOCK_RET(zeromem);
+	if (!size) return BLOCK_RET(zeromem);
 #else
-  if (!size) goto err_out;
+	if (!size) goto err_out;
 #endif
-  size+=sizeof(__alloc_t);
-  if (unlikely(size<sizeof(__alloc_t))) goto err_out;
+	size+=sizeof(__alloc_t);
+	if (unlikely(size<sizeof(__alloc_t))) goto err_out;
 
-  if (size<=__MAX_SMALL_SIZE) {
-    need=GET_SIZE(size);
-    ptr=__small_malloc(need);
-  } else {
-    need=PAGE_ALIGN(size);
-    ptr = need ? do_mmap(need) : MAP_FAILED;
-  }
-  if (ptr==MAP_FAILED) goto err_out;
-  ptr->size=need;
-  return BLOCK_RET(ptr);
+	if (size<=__MAX_SMALL_SIZE) {
+		need=GET_SIZE(size);
+		ptr=__small_malloc(need);
+		printc("malloc size %d ptr %x\n", size, ptr);
+	} else {
+		need=PAGE_ALIGN(size);
+		ptr = need ? do_mmap(need) : MAP_FAILED;
+	}
+	if (ptr==MAP_FAILED) goto err_out;
+	ptr->size=need;
+	return BLOCK_RET(ptr);
 err_out:
-  //(*__errno_location())=ENOMEM;
-  return 0;
+	//(*__errno_location())=ENOMEM;
+	return 0;
 }
 //void* __libc_malloc(size_t size) __attribute__((alias("_alloc_libc_malloc")));
 void* malloc(size_t size) __attribute__((weak,alias("_alloc_libc_malloc")));

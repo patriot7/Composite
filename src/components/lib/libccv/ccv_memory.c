@@ -26,7 +26,7 @@ static __thread int ccv_cache_opt = 0;
 
 ccv_dense_matrix_t* ccv_dense_matrix_new(int rows, int cols, int type, void* data, uint64_t sig)
 {
-	printc("ccv_dense_matrix_new()\n");
+//	printc("ccv_dense_matrix_new()\n");
 	ccv_dense_matrix_t* mat;
 	if (ccv_cache_opt && sig != 0 && !data && !(type & CCV_NO_DATA_ALLOC))
 	{
@@ -58,7 +58,7 @@ ccv_dense_matrix_t* ccv_dense_matrix_new(int rows, int cols, int type, void* dat
 		assert(data == NULL);  /* no user-managed matrix data */ 
 #endif
 		mat = (ccv_dense_matrix_t*)(data ? data : ccmalloc(ccv_compute_dense_matrix_size(rows, cols, type)));
-		printc("ccv_dense_matrix_new alloc done\n");
+		//printc("ccv_dense_matrix_new alloc done\n");
 		mat->type = (CCV_GET_CHANNEL(type) | CCV_GET_DATA_TYPE(type) | CCV_MATRIX_DENSE) & ~CCV_GARBAGE;
 		mat->type |= data ? CCV_UNMANAGED : CCV_REUSABLE; // it still could be reusable because the signature could be derived one.
 #ifndef CBUF_ENABLE

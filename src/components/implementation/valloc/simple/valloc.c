@@ -149,6 +149,8 @@ void *valloc_alloc(spdid_t spdid, spdid_t dest, unsigned long npages)
 
 done:
 	UNLOCK();
+	if (dest == 18)
+		printc("vas ret %x\n", ret);
 	return ret;
 }
 
