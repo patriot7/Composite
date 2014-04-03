@@ -7,8 +7,8 @@
 #define CBUF_ENABLE
 /*#ifdef CBUF_ENABLE*/
 #include "cbuf_ccv.h"
-#define ccmalloc cbuf_ccv_alloc 
-#define ccfree cbuf_ccv_free
+/*#define ccmalloc cbuf_ccv_alloc */
+/*#define ccfree cbuf_ccv_free*/
 /*cbufp_ccv_alloc_creator(ccmalloc);*/
 /*cbufp_ccv_free_creator(ccfree);*/
 /*#endif*/
@@ -26,11 +26,9 @@ static __thread int ccv_cache_opt = 0;
 
 ccv_dense_matrix_t* ccv_dense_matrix_new(int rows, int cols, int type, void* data, uint64_t sig)
 {
-//	printc("ccv_dense_matrix_new()\n");
 	ccv_dense_matrix_t* mat;
 	if (ccv_cache_opt && sig != 0 && !data && !(type & CCV_NO_DATA_ALLOC))
 	{
-		printc("no1\n");
 #ifdef CBUF_ENABLE
 		assert(0); /* ccv_cache not supported */ 
 #endif
@@ -46,7 +44,6 @@ ccv_dense_matrix_t* ccv_dense_matrix_new(int rows, int cols, int type, void* dat
 	}
 	if (type & CCV_NO_DATA_ALLOC)
 	{
-		printc("no2\n");
 #ifdef CBUF_ENABLE
 		assert(0); /* CCV_NO_DATA_ALLOC not supported */ 
 #endif
@@ -57,8 +54,7 @@ ccv_dense_matrix_t* ccv_dense_matrix_new(int rows, int cols, int type, void* dat
 #ifdef CBUF_ENABLE
 		assert(data == NULL);  /* no user-managed matrix data */ 
 #endif
-		mat = (ccv_dense_matrix_t*)(data ? data : ccmalloc(ccv_compute_dense_matrix_size(rows, cols, type)));
-		//printc("ccv_dense_matrix_new alloc done\n");
+		mat = (ccv_dense_matrix_t*)(data ? data : cbuf_ccv_alloc(ccv_compute_dense_matrix_size(rows, cols, type)));
 		mat->type = (CCV_GET_CHANNEL(type) | CCV_GET_DATA_TYPE(type) | CCV_MATRIX_DENSE) & ~CCV_GARBAGE;
 		mat->type |= data ? CCV_UNMANAGED : CCV_REUSABLE; // it still could be reusable because the signature could be derived one.
 #ifndef CBUF_ENABLE
@@ -206,7 +202,7 @@ void ccv_matrix_free(ccv_matrix_t* mat)
 			dmt->sig == 0 || // or this doesn't have valid signature
 			(dmt->type & CCV_NO_DATA_ALLOC)) // or this matrix is allocated as header-only, therefore we cannot cache it
 		{
-			ccfree(dmt);
+			cbuf_ccv_free(dmt);
 			/* TODO just deref cbufp or clean the whole cbufp? */ 
 		}
 		else {
@@ -219,6 +215,7 @@ void ccv_matrix_free(ccv_matrix_t* mat)
 			ccv_cache_put(&ccv_cache, dmt->sig, dmt, size, 0 /* type 0 */);
 		}
 	} else if (type & CCV_MATRIX_SPARSE) {
+		assert(0);
 		ccv_sparse_matrix_t* smt = (ccv_sparse_matrix_t*)mat;
 		int i;
 		for (i = 0; i < CCV_GET_SPARSE_PRIME(smt->prime); i++)
@@ -259,13 +256,13 @@ ccv_array_t* ccv_array_new(int rsize, int rnum, uint64_t sig)
 			return array;
 		}
 	}
-	array = (ccv_array_t*)malloc(sizeof(ccv_array_t));
+	array = (ccv_array_t*)ccmalloc(sizeof(ccv_array_t));
 	array->sig = sig;
 	array->type = CCV_REUSABLE & ~CCV_GARBAGE;
 	array->rnum = 0;
 	array->rsize = rsize;
 	array->size = ccv_max(rnum, 2 /* allocate memory for at least 2 items */);
-	array->data = malloc((size_t)array->size * (size_t)rsize);
+	array->data = ccmalloc((size_t)array->size * (size_t)rsize);
 	return array;
 }
 

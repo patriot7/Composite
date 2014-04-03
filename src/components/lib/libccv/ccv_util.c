@@ -1057,12 +1057,10 @@ int ccv_array_group(ccv_array_t* array, ccv_array_t** index, ccv_array_group_f g
 			}
 		}
 	}
-	printc("array group 1\n");
 	if (*index == 0)
 		*index = ccv_array_new(sizeof(int), array->rnum, 0);
 	else
 		ccv_array_clear(*index);
-	printc("array group 2\n");
 	ccv_array_t* idx = *index;
 
 	int class_idx = 0;
@@ -1080,7 +1078,6 @@ int ccv_array_group(ccv_array_t* array, ccv_array_t** index, ccv_array_group_f g
 		}
 		ccv_array_push(idx, &j);
 	}
-	printc("shouldn't call cbufp_free here\n");
 	ccfree(node);
 	return class_idx;
 }

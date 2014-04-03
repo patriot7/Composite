@@ -1204,10 +1204,8 @@ ccv_array_t* ccv_bbf_detect_objects(ccv_dense_matrix_t* a, ccv_bbf_classifier_ca
 	int i, j, k, t, x, y, q;
 	for (i = 1; i < ccv_min(params.interval + 1, scale_upto + next * 2); i++)
 		ccv_resample(pyr[0], &pyr[i * 4], 0, (int)(pyr[0]->rows / pow(scale, i)), (int)(pyr[0]->cols / pow(scale, i)), CCV_INTER_AREA);
-	printc("resample1 done\n");
 	for (i = next; i < scale_upto + next * 2; i++)
 		ccv_sample_down(pyr[i * 4 - next * 4], &pyr[i * 4], 0, 0, 0);
-	printc("resample2 done\n");
 	if (params.accurate)
 		for (i = next * 2; i < scale_upto + next * 2; i++)
 		{
@@ -1216,7 +1214,6 @@ ccv_array_t* ccv_bbf_detect_objects(ccv_dense_matrix_t* a, ccv_bbf_classifier_ca
 			ccv_sample_down(pyr[i * 4 - next * 4], &pyr[i * 4 + 3], 0, 1, 1);
 			printc("%d/%d done\n", i, scale_upto + next * 2);
 		}
-	printc("resample3 done\n");
 	ccv_array_t* idx_seq;
 	ccv_array_t* seq = ccv_array_new(sizeof(ccv_comp_t), 64, 0);
 	ccv_array_t* seq2 = ccv_array_new(sizeof(ccv_comp_t), 64, 0);
@@ -1282,7 +1279,6 @@ ccv_array_t* ccv_bbf_detect_objects(ccv_dense_matrix_t* a, ccv_bbf_classifier_ca
 			scale_x *= scale;
 			scale_y *= scale;
 		}
-		printc("multi scale done\n");
 
 		/* the following code from OpenCV's haar feature implementation */
 		if(params.min_neighbors == 0)
@@ -1296,10 +1292,8 @@ ccv_array_t* ccv_bbf_detect_objects(ccv_dense_matrix_t* a, ccv_bbf_classifier_ca
 			idx_seq = 0;
 			ccv_array_clear(seq2);
 			// group retrieved rectangles in order to filter out noise
-			printc("group array\n");
 			int ncomp = ccv_array_group(seq, &idx_seq, _ccv_is_equal_same_class, 0);
-			printc("group array done\n");
-			ccv_comp_t* comps = (ccv_comp_t*)ccmalloc((ncomp + 1) * sizeof(ccv_comp_t));
+			ccv_comp_t* comps = (ccv_comp_t*)malloc((ncomp + 1) * sizeof(ccv_comp_t));
 			memset(comps, 0, (ncomp + 1) * sizeof(ccv_comp_t));
 
 			// count number of neighbors
@@ -1373,7 +1367,6 @@ ccv_array_t* ccv_bbf_detect_objects(ccv_dense_matrix_t* a, ccv_bbf_classifier_ca
 
 	ccv_array_free(seq);
 	ccv_array_free(seq2);
-	printc("phrase 1 done\n");
 
 	ccv_array_t* result_seq2;
 	/* the following code from OpenCV's haar feature implementation */
@@ -1413,18 +1406,21 @@ ccv_array_t* ccv_bbf_detect_objects(ccv_dense_matrix_t* a, ccv_bbf_classifier_ca
 	}
 
 	for (i = 1; i < scale_upto + next * 2; i++)
-		ccv_matrix_free(pyr[i * 4]);
+		ccfree(pyr[i * 4]);
 	if (params.accurate)
 		for (i = next * 2; i < scale_upto + next * 2; i++)
 		{
-			ccv_matrix_free(pyr[i * 4 + 1]);
-			ccv_matrix_free(pyr[i * 4 + 2]);
-			ccv_matrix_free(pyr[i * 4 + 3]);
+			/*ccv_matrix_free(pyr[i * 4 + 1]);*/
+			/*ccv_matrix_free(pyr[i * 4 + 2]);*/
+			/*ccv_matrix_free(pyr[i * 4 + 3]);*/
+			ccfree(pyr[i * 4 + 1]);
+			ccfree(pyr[i * 4 + 2]);
+			ccfree(pyr[i * 4 + 3]);
 		}
 	if (params.size.height != _cascade[0]->size.height || params.size.width != _cascade[0]->size.width)
-		ccv_matrix_free(pyr[0]);
+		ccfree(pyr[0]);
 
-	free(pyr);
+	ccfree(pyr);
 
 	return result_seq2;
 }
@@ -1433,14 +1429,12 @@ ccv_bbf_classifier_cascade_t* ccv_bbf_read_classifier_cascade(const char* direct
 {
 	char buf[1024];
 	sprintf(buf, "%s/cascade.txt", directory);
-	printc("read cascade file, dir = %s\n", directory);
 	int s, i;
 	FILE* r = fopen(buf, "r");
 	if (r == 0)
 		return 0;
 	ccv_bbf_classifier_cascade_t* cascade = (ccv_bbf_classifier_cascade_t*)ccmalloc(sizeof(ccv_bbf_classifier_cascade_t));
 	s = fscanf(r, "%d %d %d", &cascade->count, &cascade->size.width, &cascade->size.height);
-	printc("cascade->count = %d\n", cascade->count);
 	assert(s > 0);
 	cascade->stage_classifier = (ccv_bbf_stage_classifier_t*)ccmalloc(cascade->count * sizeof(ccv_bbf_stage_classifier_t));
 	for (i = 0; i < cascade->count; i++)
