@@ -25,11 +25,11 @@ cos_init(void)
         ccv_dense_matrix_t *ccv_mat_output = NULL;
 
 
-        evt_tsplit = evt_split(cos_spd_id(), 0, 0);
-        td = ccv_fd_tsplit(cos_spd_id(), td_root, "face", strlen("face"), TOR_ALL, evt_tsplit);
-
         ccv_read("photo.bmp", &ccv_mat_input, CCV_IO_ANY_FILE | CCV_IO_GRAY);
         assert(ccv_mat_input);
+
+        evt_tsplit = evt_split(cos_spd_id(), 0, 0);
+        td = ccv_fd_tsplit(cos_spd_id(), td_root, "face", strlen("face"), TOR_ALL, evt_tsplit);
 
         cbuf_matrix_t *cbuf_mat = ccv2cbufmat(ccv_mat_input);
         cbufp_send_deref(cbuf_mat->cbid);

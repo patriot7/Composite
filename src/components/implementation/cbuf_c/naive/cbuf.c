@@ -316,6 +316,7 @@ cbuf_c_register(spdid_t spdid, long cbid)
 		RELEASE();
 		return -1;
 	}
+	memset(mgr_addr, 0, PAGE_SIZE);
 	sti->managed = 1;
 	__spd_cbvect_add_range(sti, cbid, mgr_addr);
 	RELEASE();
