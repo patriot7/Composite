@@ -346,7 +346,9 @@ void ccv_resample(ccv_dense_matrix_t* a, ccv_dense_matrix_t** b, int btype, int 
 {
 	ccv_declare_derived_signature(sig, a->sig != 0, ccv_sign_with_format(64, "ccv_resample(%d,%d,%d)", rows, cols, type), a->sig, CCV_EOF_SIGN);
 	btype = (btype == 0) ? CCV_GET_DATA_TYPE(a->type) | CCV_GET_CHANNEL(a->type) : CCV_GET_DATA_TYPE(btype) | CCV_GET_CHANNEL(a->type);
+	printc("ccv_resample: before ccv_mat_renew\n");
 	ccv_dense_matrix_t* db = *b = ccv_dense_matrix_renew(*b, rows, cols, CCV_ALL_DATA_TYPE | CCV_GET_CHANNEL(a->type), btype, sig);
+	printc("ccv_resample: after ccv_mat_renew\n");
 	ccv_object_return_if_cached(, db);
 	if (a->rows == db->rows && a->cols == db->cols)
 	{

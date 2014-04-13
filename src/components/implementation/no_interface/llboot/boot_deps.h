@@ -155,6 +155,7 @@ llboot_thd_done(void)
 			cos_upcall(rspd, 0); /* This will escape from the loop */
 			assert(0);
 		} else {		/* ...done reinitializing...resume */
+			while(1);
 			assert(pthd && pthd != tid);
 			llboot->prev_thd = 0;   /* FIXME: atomic action required... */
 			cos_switch_thread(pthd, 0);

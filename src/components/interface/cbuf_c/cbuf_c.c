@@ -83,6 +83,7 @@ __cbuf_desc_alloc(int cbid, int size, void *addr, struct cbuf_meta *cm, int tmem
 void
 __cbuf_desc_free(struct cbuf_alloc_desc *d)
 {
+	printc("cbuf_desc_free: d = %p\n", d);
 	assert(d);
 	assert(cvect_lookup(&alloc_descs, (unsigned long)d->addr >> PAGE_ORDER) == d);
 	
@@ -259,7 +260,9 @@ __cbuf_alloc_slow(int size, int *len, int tmem)
 	 */
 	/* TODO: check if this is correct. what if this cbuf is from
 	 * the local cache and has been taken by another thd? */
+	printc("cbuf_c: addr = %p\n", addr);
 	d_prev = __cbuf_alloc_lookup((u32_t)addr>>PAGE_ORDER);
+	printc("cbuf_c: d_prev = %p\n", d_prev);
 	if (d_prev) __cbuf_desc_free(d_prev);
 	ret    = __cbuf_desc_alloc(cbid, size, addr, cm, tmem);
 done:   

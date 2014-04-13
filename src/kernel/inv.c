@@ -2809,14 +2809,13 @@ cos_syscall_mmap_cntl(int spdid, long op_flags_dspd, vaddr_t daddr, unsigned lon
 			ret = -1;
 			break;
 		}
-		if (daddr >= 0x4dc00000) {
-//			printk("pte addr %x\n", daddr);
-		if (chal_pgtbl_add(spd->composite_spd->pg_tbl, daddr, page, flags)) {
-			printk("cos: mmap grant into %d @ %x -- could not add entry to page table.\n", 
-			       dspd_id, (unsigned int)daddr);
-			ret = -1;
-			break;
-		}
+		if (daddr >= 0x4E400000) {
+			if (chal_pgtbl_add(spd->composite_spd->pg_tbl, daddr, page, flags)) {
+				printk("cos: mmap grant into %d @ %x -- could not add entry to page table.\n", 
+						dspd_id, (unsigned int)daddr);
+				ret = -1;
+				break;
+			}
 		}
 
 		cos_meas_event(COS_MAP_GRANT);

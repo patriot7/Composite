@@ -20,7 +20,7 @@ vm.o-fprr.o|print.o|mm.o|l.o|boot.o;\
 va.o-fprr.o|print.o|mm.o|l.o|boot.o|vm.o;\
 rotar.o-sm.o|fprr.o|print.o|mm.o|buf.o|bufp.o|l.o|eg.o|va.o|initfs.o;\
 ccv_exit.o-sm.o|fprr.o|print.o|mm.o|buf.o|bufp.o|l.o|eg.o|va.o|initfs.o|[fs_]rotar.o;\
-ccv_rs.o-sm.o|fprr.o|print.o|mm.o|buf.o|bufp.o|l.o|eg.o|va.o|initfs.o|[fs_]rotar.o|[next_stage_]ccv_exit.o;\
-tor_rs.o-sm.o|fprr.o|print.o|mm.o|buf.o|bufp.o|l.o|eg.o|va.o|initfs.o|[fs_]rotar.o|[ccv_rs_]ccv_rs.o|[next_stage_]ccv_exit.o;\
+ccv_rs.o-sm.o|fprr.o|print.o|mm.o|buf.o|bufp.o|l.o|eg.o|va.o|initfs.o|[fs_]rotar.o|[ccv_rs_nxt_]ccv_exit.o;\
+tor_rs.o-sm.o|fprr.o|print.o|mm.o|buf.o|bufp.o|l.o|eg.o|va.o|initfs.o|[fs_]rotar.o|[ccv_rs_]ccv_rs.o|[ccv_rs_nxt_]ccv_exit.o;\
 trans.o-sm.o|fprr.o|l.o|buf.o|bufp.o|mm.o|va.o|eg.o|print.o\
 " ./gen_client_stub

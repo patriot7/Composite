@@ -523,13 +523,20 @@ again:
 done:
 	*cb = cbuf_cons(cbid, len);
 	CBUF_RELEASE();
+	printc("cbuf.h: __cbuf_allloc return %p\n", ret);
 	return ret;
 }
 
 static inline void *
 cbuf_alloc(unsigned int sz, cbuf_t *cb) { return __cbuf_alloc(sz, cb, 1); }
+/*static inline void **/
+/*cbufp_alloc(unsigned int sz, cbufp_t *cb)  { return __cbuf_alloc(sz, (cbuf_t*)cb, 0); }*/
 static inline void *
-cbufp_alloc(unsigned int sz, cbufp_t *cb)  { return __cbuf_alloc(sz, (cbuf_t*)cb, 0); }
+cbufp_alloc(unsigned int sz, cbufp_t *cb)  { 
+	void *test = __cbuf_alloc(sz, (cbuf_t*)cb, 0);
+	printc("cbuf.h: cbufp_alloc get return value %p\n", test);
+	return test;
+}
 
 /* 
  * precondition:  cbuf lock must be taken.

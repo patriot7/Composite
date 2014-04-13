@@ -421,8 +421,7 @@ int spd_add_location(struct spd *spd, long base, long size)
 	spd->location[i].lowest_addr = base;
 	spd->location[i].size = size;
 	BUG_ON(chal_pgtbl_add_middledir_range(spd->spd_info.pg_tbl, base, size));
-	if (base >= 0x4dc00000) {
-//		printk("vas addr %x\n", base);
+	if (base >= 0x4E400000) {
 		BUG_ON(chal_pgtbl_add_middledir_range(spd->composite_spd->pg_tbl, base, size));
 	}
 done:

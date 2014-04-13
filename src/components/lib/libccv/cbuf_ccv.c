@@ -31,7 +31,9 @@ cbuf_ccv_alloc(unsigned int sz)
 	ccv_dense_matrix_t *mat = NULL;
 	cbuf_matrix_t *cbuf_mat = NULL;
 
+	printc("cbuf_ccv: before cbufp_alloc\n");
 	cbuf_mat = (cbuf_matrix_t *)cbufp_alloc(cbuf_size, &cb);
+	printc("cbuf_ccv: after cbufp_alloc\n");
 	assert(cbuf_mat);
 
 	mat = (ccv_dense_matrix_t *)malloc(sizeof(ccv_dense_matrix_t));

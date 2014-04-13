@@ -19,8 +19,8 @@
 
 cbuf_matrix_t *cbuf_mat_tmp;
 
-extern td_t next_stage_tsplit(spdid_t spdid, td_t td, char *param, int len, tor_flags_t tflags, long evtid); 
-extern int next_stage_twritep(spdid_t spdid, td_t td, int cbid, int sz);
+extern td_t ccv_ed_nxt_tsplit(spdid_t spdid, td_t td, char *param, int len, tor_flags_t tflags, long evtid); 
+extern int ccv_ed_nxt_twritep(spdid_t spdid, td_t td, int cbid, int sz);
 
 td_t 
 tsplit(spdid_t spdid, td_t td, char *param,
@@ -84,7 +84,7 @@ twritep(spdid_t spdid, td_t td, int cbid, int sz)
        char *buf;
        struct torrent *t;
        long evtid;
-       td_t next_stage_td;
+       td_t ccv_ed_nxt_td;
        ccv_dense_matrix_t *ccv_mat_input = NULL;
        ccv_dense_matrix_t *ccv_mat_output = NULL;
 
@@ -111,8 +111,8 @@ twritep(spdid_t spdid, td_t td, int cbid, int sz)
 
        /* send to next stage */
        evtid = evt_split(cos_spd_id(), 0, 0);
-       next_stage_td = next_stage_tsplit(cos_spd_id(), td_root, "", strlen(""), TOR_ALL, evtid);
-       next_stage_twritep(cos_spd_id(), next_stage_td, cbuf_mat_tmp->cbid, cbuf_mat_tmp->size);
+       ccv_ed_nxt_td = ccv_ed_nxt_tsplit(cos_spd_id(), td_root, "", strlen(""), TOR_ALL, evtid);
+       ccv_ed_nxt_twritep(cos_spd_id(), ccv_ed_nxt_td, cbuf_mat_tmp->cbid, cbuf_mat_tmp->size);
 
        return ret; /*TODO: ret value */
 }
